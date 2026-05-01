@@ -1,0 +1,333 @@
+FastPig backend routes and database methods
+
+Project structure note:
+- Frontend is created in C:\kucher\fastpig
+- This file lists the API methods that are useful for connecting the frontend to your backend
+
+1. Auth
+
+POST /api/auth/register
+- Create new user
+- Save: name, phone, email, password_hash, role, created_at
+
+POST /api/auth/login
+- Authorize user by email/phone and password
+- Return access token, refresh token, user profile, role
+
+POST /api/auth/refresh
+- Refresh access token by refresh token
+
+POST /api/auth/logout
+- Invalidate refresh token/session
+
+POST /api/auth/forgot-password
+- Start password reset flow
+
+POST /api/auth/reset-password
+- Set new password by reset token/code
+
+GET /api/auth/me
+- Return current authorized user
+
+Database methods:
+- create_user(...)
+- find_user_by_email(...)
+- find_user_by_phone(...)
+- get_user_by_id(...)
+- save_refresh_token(...)
+- validate_refresh_token(...)
+- revoke_refresh_token(...)
+- update_user_password(...)
+
+2. Users / Profile
+
+GET /api/users/profile
+- Get personal cabinet data
+
+PUT /api/users/profile
+- Update owner profile
+
+GET /api/users/:id
+- Admin gets one user
+
+GET /api/users
+- Admin gets users list with pagination/search
+
+Database methods:
+- get_profile_with_pets(user_id)
+- update_user_profile(user_id, payload)
+- list_users(filters, pagination)
+- get_user_details(user_id)
+
+3. Pets
+
+POST /api/pets
+- Create pet card
+
+GET /api/pets
+- Get current user's pets
+
+GET /api/pets/:id
+- Get one pet card
+
+PUT /api/pets/:id
+- Update pet card
+
+DELETE /api/pets/:id
+- Archive/delete pet card
+
+GET /api/pets/:id/history
+- Visits, diagnoses, files, vaccines
+
+Database methods:
+- create_pet(user_id, payload)
+- get_user_pets(user_id)
+- get_pet_by_id(pet_id)
+- update_pet(pet_id, payload)
+- delete_pet(pet_id)
+- get_pet_medical_history(pet_id)
+
+4. Doctors
+
+GET /api/doctors
+- Public list of doctors
+
+GET /api/doctors/:id
+- Doctor card, specialization, schedule
+
+GET /api/doctors/:id/slots?date=YYYY-MM-DD
+- Available time slots for booking
+
+Database methods:
+- list_doctors(filters)
+- get_doctor_by_id(doctor_id)
+- get_doctor_available_slots(doctor_id, date)
+- update_doctor_schedule(doctor_id, payload)
+
+5. Services
+
+GET /api/services
+- Public list of clinic services
+
+GET /api/services/:id
+- Detailed service card
+
+POST /api/services
+- Admin creates service
+
+PUT /api/services/:id
+- Admin updates service
+
+DELETE /api/services/:id
+- Admin archives service
+
+Database methods:
+- list_services(filters)
+- get_service_by_id(service_id)
+- create_service(payload)
+- update_service(service_id, payload)
+- delete_service(service_id)
+
+6. Appointments
+
+POST /api/appointments
+- Create appointment
+- Save: user_id, pet_id, service_id, doctor_id(optional), date, time, comment, status
+
+GET /api/appointments
+- Current user's appointments
+
+GET /api/appointments/:id
+- Detailed appointment
+
+PUT /api/appointments/:id
+- Edit appointment before visit
+
+PATCH /api/appointments/:id/status
+- Change status: pending, confirmed, canceled, completed, paid
+
+DELETE /api/appointments/:id
+- Cancel appointment
+
+GET /api/admin/appointments
+- Admin list of all appointments
+
+Database methods:
+- create_appointment(user_id, payload)
+- list_user_appointments(user_id, filters)
+- get_appointment_by_id(appointment_id)
+- update_appointment(appointment_id, payload)
+- update_appointment_status(appointment_id, status)
+- cancel_appointment(appointment_id)
+- list_all_appointments(filters, pagination)
+
+7. Catalog products
+
+GET /api/products
+- Public catalog with filters by category, search, price, stock
+
+GET /api/products/:id
+- Product card
+
+POST /api/products
+- Admin creates product
+
+PUT /api/products/:id
+- Admin updates product
+
+PATCH /api/products/:id/stock
+- Update stock amount/status
+
+DELETE /api/products/:id
+- Admin archives product
+
+Database methods:
+- list_products(filters, pagination)
+- get_product_by_id(product_id)
+- create_product(payload)
+- update_product(product_id, payload)
+- update_product_stock(product_id, stock_payload)
+- delete_product(product_id)
+
+8. Favorites
+
+GET /api/favorites
+- Get all favorites of current user
+
+POST /api/favorites
+- Add favorite item
+- Payload: entity_type (product/service/doctor), entity_id
+
+DELETE /api/favorites/:id
+- Remove favorite by favorite record id
+
+Database methods:
+- list_user_favorites(user_id)
+- add_favorite(user_id, entity_type, entity_id)
+- remove_favorite(favorite_id, user_id)
+- exists_favorite(user_id, entity_type, entity_id)
+
+9. Orders / cart (recommended if catalog will be real)
+
+GET /api/cart
+- Get cart with products
+
+POST /api/cart/items
+- Add product to cart
+
+PUT /api/cart/items/:id
+- Change quantity
+
+DELETE /api/cart/items/:id
+- Remove item from cart
+
+POST /api/orders
+- Create order from cart
+
+GET /api/orders
+- User order history
+
+GET /api/orders/:id
+- Order details
+
+PATCH /api/orders/:id/status
+- Admin changes order status
+
+Database methods:
+- get_user_cart(user_id)
+- add_cart_item(user_id, product_id, quantity)
+- update_cart_item(item_id, quantity)
+- remove_cart_item(item_id, user_id)
+- create_order_from_cart(user_id, payload)
+- list_user_orders(user_id)
+- get_order_by_id(order_id)
+- update_order_status(order_id, status)
+
+10. News / home feed
+
+GET /api/news
+- Main page feed, clinic updates, promos
+
+POST /api/news
+- Admin creates publication
+
+PUT /api/news/:id
+- Admin updates publication
+
+DELETE /api/news/:id
+- Admin deletes publication
+
+Database methods:
+- list_news(filters, pagination)
+- create_news(payload)
+- update_news(news_id, payload)
+- delete_news(news_id)
+
+11. Reviews
+
+GET /api/reviews
+- Public clinic reviews
+
+POST /api/reviews
+- User creates review after visit/order
+
+PATCH /api/reviews/:id/moderate
+- Admin approves/rejects review
+
+Database methods:
+- list_reviews(filters, pagination)
+- create_review(user_id, payload)
+- moderate_review(review_id, status)
+
+12. Clinic info / about
+
+GET /api/clinic/about
+- About page content: contacts, address, work time, social links, licenses
+
+PUT /api/admin/clinic/about
+- Admin updates clinic information
+
+Database methods:
+- get_clinic_info()
+- update_clinic_info(payload)
+
+13. Admin dashboard
+
+GET /api/admin/dashboard
+- Return counters for appointments, users, products, low stock, reviews
+
+Database methods:
+- get_admin_dashboard_metrics()
+- get_low_stock_products()
+- get_pending_reviews_count()
+- get_appointments_stats(period)
+
+Recommended core database tables:
+- users
+- refresh_tokens or sessions
+- pets
+- pet_medical_history
+- doctors
+- doctor_schedules
+- services
+- appointments
+- products
+- favorites
+- cart_items
+- orders
+- order_items
+- news
+- reviews
+- clinic_info
+
+Minimum first version if you want to launch quickly:
+- auth
+- users/profile
+- pets
+- services
+- doctors + slots
+- appointments
+- products
+- favorites
+- clinic/about
+- admin/dashboard
