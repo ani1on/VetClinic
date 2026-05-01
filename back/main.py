@@ -1,10 +1,10 @@
-import asyncio
-import sys
+from .back_vet.api.core import app
+from .back_vet.api.routers import auth, users
 
-from back_vet.api.core import app
+app.include_router(auth.router)
+app.include_router(users.router)
 
-def start_app():
-    from subprocess import run
-    if sys.platform == "win32":
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    run(["py","-m","uvicorn", "main:app","--reload"])
+@app.on_event("startup")
+def startup():
+    from .back_vet.database.core import init_db
+    init_db()                       # ← создаёт все таблицы

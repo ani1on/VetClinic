@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, and_, or_
-from database import models
+from ..database import models
 
 # =========================== AUTH ===========================
 def create_user(db: Session, name: str, phone: str, email: str, password_hash: str, role: str = "client") -> models.User:
