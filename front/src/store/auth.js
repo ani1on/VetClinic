@@ -1,8 +1,7 @@
 import { reactive } from 'vue';
 import authService from '@/services/authService';
-import apiClient from '@/services/api'; // понадобится для интерсепторов
 
-// Локальное хранилище (можно заменить на localStorage)
+// Ключи для localStorage
 const TOKEN_KEY = 'access_token';
 const REFRESH_KEY = 'refresh_token';
 
@@ -11,11 +10,12 @@ function saveTokens(access, refresh) {
   if (refresh) localStorage.setItem(REFRESH_KEY, refresh);
 }
 
-function clearTokens() {
+export function clearTokens() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
 }
 
+// Реактивное состояние
 export const authState = reactive({
   user: null,
   isAuthenticated: false,
@@ -23,7 +23,8 @@ export const authState = reactive({
   error: null,
 });
 
-// Функции авторизации
+// ===== Действия =====
+
 export async function login(credentials) {
   authState.isLoading = true;
   authState.error = null;
@@ -62,8 +63,8 @@ export async function logout() {
   const refresh = localStorage.getItem(REFRESH_KEY);
   try {
     if (refresh) await authService.logout(refresh);
-  } catch (e) {
-    // игнорируем
+  } catch {
+    // не критично
   }
   clearTokens();
   authState.user = null;
@@ -76,14 +77,15 @@ export async function fetchProfile() {
     authState.user = resp.data;
     authState.isAuthenticated = true;
   } catch {
-    // если токен протух – обработает интерсептор
+    // Если 401 – интерсептор попробует обновить и повторит, либо разлогинет
+    authState.isAuthenticated = false;
   }
 }
 
-// Восстановление сессии при запуске приложения
+// Восстановление сессии при запуске
 export async function initAuth() {
-  const access = localStorage.getItem(TOKEN_KEY);
-  if (access) {
-    await fetchProfile(); // попробуем получить /me
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) {
+    await fetchProfile();  // если токен валиден, isAuthenticated станет true
   }
 }

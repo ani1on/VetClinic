@@ -8,8 +8,7 @@ import FavoritesView from "../views/FavoritesView.vue";
 import AboutView from "../views/AboutView.vue";
 import AdminView from "../views/AdminView.vue";
 
-import { createRouter, createWebHistory } from 'vue-router';
-import { authState, initAuth } from '@/store/auth';
+import { authState} from '@/store/auth';
 
 
 const routes = [

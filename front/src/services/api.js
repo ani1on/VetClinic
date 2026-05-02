@@ -1,17 +1,11 @@
-// src/services/api.js
 import axios from 'axios';
 
 const apiClient = axios.create({
-    //todo поменять адрест апишки
-  baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8000/api', // адрес твоего FastAPI
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.VUE_APP_API_URL || '/api',
+  headers: { 'Content-Type': 'application/json' },
 });
 
-export default apiClient;
-
-// Добавляем токен в каждый запрос
+// ---- интерсептор запросов: цепляем токен ----
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
   if (token) {
@@ -20,7 +14,7 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// При 401 ошибке пробуем обновить токен
+// ---- интерсептор ответов: рефреш при 401 ----
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -40,10 +34,9 @@ apiClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return apiClient(originalRequest);
         } catch (refreshError) {
-          // рефреш неудачен — разлогиниваем
+          // Рефреш провалился — разлогиниваем
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          // можно перенаправить на страницу входа
           window.location.href = '/auth';
           return Promise.reject(refreshError);
         }
@@ -52,3 +45,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export default apiClient;
