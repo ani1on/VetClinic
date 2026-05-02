@@ -23,6 +23,24 @@
         >
           {{ item.label }}
         </router-link>
+
+        <!-- Динамическая кнопка авторизации -->
+        <a
+          v-if="!authState.isAuthenticated"
+          class="nav-link"
+          href="#"
+          @click.prevent="goToAuth"
+        >
+          Auth
+        </a>
+        <a
+          v-else
+          class="nav-link"
+          href="#"
+          @click.prevent="handleLogout"
+        >
+          Logout
+        </a>
       </nav>
     </header>
 
@@ -33,13 +51,15 @@
 </template>
 
 <script>
+import { authState, logout } from '@/store/auth';
+
 export default {
   name: "App",
   data() {
     return {
       isMenuOpen: false,
+      authState: authState,
       navigation: [
-        { label: "Auth", to: "/auth" },
         { label: "Home", to: "/" },
         { label: "Catalog", to: "/catalog" },
         { label: "Profile", to: "/profile" },
@@ -50,9 +70,21 @@ export default {
       ],
     };
   },
+  methods: {
+    goToAuth() {
+      this.isMenuOpen = false;
+      this.$router.push('/auth');
+    },
+    async handleLogout() {
+      this.isMenuOpen = false;
+      await logout();
+      this.$router.push('/auth');
+    },
+  },
 };
 </script>
 
+<!-- Стили остаются без изменений -->
 <style>
 :root {
   --bg: #fffaf4;

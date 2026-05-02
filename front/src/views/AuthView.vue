@@ -69,31 +69,19 @@ export default {
   name: 'AuthView',
   data() {
     return {
-      loginForm: {
-        login: '',
-        password: '',
-      },
-      registerForm: {
-        name: '',
-        phone: '',
-        email: '',
-        password: '',
-      },
+      loginForm: { login: '', password: '' },
+      registerForm: { name: '', phone: '', email: '', password: '' },
+      authState: authState,   // <-- прокидываем реактивный объект в data
     };
   },
-  computed: {
-    authState() {
-      // чтобы шаблон видел authState
-      return authState;
-    },
-  },
+  // computed больше не нужен, удалите его
   methods: {
     async handleLogin() {
       try {
         await login(this.loginForm);
-        this.$router.push('/'); // после входа на главную
+        this.$router.push('/');
       } catch {
-        // ошибка уже показана в authState.error
+        // ошибка теперь отобразится автоматически
       }
     },
     async handleRegister() {
@@ -101,7 +89,7 @@ export default {
         await register(this.registerForm);
         this.$router.push('/');
       } catch {
-        // ошибка показана
+        // ошибка отобразится
       }
     },
   },
