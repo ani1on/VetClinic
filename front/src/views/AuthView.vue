@@ -68,7 +68,43 @@
 </template>
 
 <script>
+import { login, register, authState } from '@/store/auth';
+
 export default {
   name: "AuthView",
+  data() {
+    return {
+      // данные формы логина
+      loginForm: {
+        login: '',
+        password: '',
+      },
+      // данные формы регистрации
+      registerForm: {
+        name: '',
+        phone: '',
+        email: '',
+        password: '',
+      },
+    };
+  },
+  methods: {
+    async handleLogin() {
+      try {
+        await login(this.loginForm);
+        this.$router.push('/'); // после успешного входа перенаправь на главную
+      } catch {
+        // ошибка уже в authState.error, можно показать
+      }
+    },
+    async handleRegister() {
+      try {
+        await register(this.registerForm);
+        this.$router.push('/');
+      } catch {
+        // обработка
+      }
+    },
+  },
 };
 </script>

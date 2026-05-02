@@ -8,15 +8,19 @@ import FavoritesView from "../views/FavoritesView.vue";
 import AboutView from "../views/AboutView.vue";
 import AdminView from "../views/AdminView.vue";
 
+import { createRouter, createWebHistory } from 'vue-router';
+import { authState, initAuth } from '@/store/auth';
+
+
 const routes = [
   { path: "/", name: "home", component: HomeView },
   { path: "/auth", name: "auth", component: AuthView },
-  { path: "/catalog", name: "catalog", component: CatalogView },
-  { path: "/profile", name: "profile", component: ProfileView },
-  { path: "/appointment", name: "appointment", component: AppointmentView },
-  { path: "/favorits", name: "favorits", component: FavoritesView },
+  { path: "/catalog", name: "catalog", component: CatalogView, meta: { requiresAuth: true } },
+  { path: "/profile", name: "profile", component: ProfileView, meta: { requiresAuth: true }  },
+  { path: "/appointment", name: "appointment", component: AppointmentView, meta: { requiresAuth: true }  },
+  { path: "/favorits", name: "favorits", component: FavoritesView, meta: { requiresAuth: true }  },
   { path: "/about", name: "about", component: AboutView },
-  { path: "/admin", name: "admin", component: AdminView },
+  { path: "/admin", name: "admin", component: AdminView, meta: { requiresAuth: true }  },
 ];
 
 const router = createRouter({
@@ -26,5 +30,14 @@ const router = createRouter({
     return { top: 0 };
   },
 });
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !authState.isAuthenticated) {
+    next('/auth');
+  } else {
+    next();
+  }
+});
+
 
 export default router;
