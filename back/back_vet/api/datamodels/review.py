@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, BaseModel
 from typing import Optional
 from datetime import datetime
 from . import ORMModel
@@ -8,7 +8,7 @@ class ReviewCreateRequest(BaseModel):
     comment: Optional[str] = None
 
 class ReviewModerateRequest(BaseModel):
-    status: str = Field(..., regex='^(approved|rejected)$')
+    status: str = Field(..., pattern='^(approved|rejected)$')
 
 class ReviewResponse(ORMModel):
     id: int

@@ -1,4 +1,4 @@
-from pydantic import Field, validator
+from pydantic import Field, validator, BaseModel
 from typing import Optional
 from . import ORMModel
 from .product import ProductResponse

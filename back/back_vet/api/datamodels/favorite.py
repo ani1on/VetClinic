@@ -1,9 +1,9 @@
-from pydantic import Field
+from pydantic import Field, BaseModel
 from datetime import datetime
 from . import ORMModel
 
 class FavoriteCreateRequest(BaseModel):
-    entity_type: str = Field(..., regex='^(product|service|doctor)$')
+    entity_type: str = Field(...,pattern='^(product|service|doctor)$')
     entity_id: int
 
 class FavoriteResponse(ORMModel):

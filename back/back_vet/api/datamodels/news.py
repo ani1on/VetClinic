@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, BaseModel
 from typing import Optional
 from datetime import datetime
 from . import ORMModel

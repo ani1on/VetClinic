@@ -1,4 +1,4 @@
-from pydantic import Field, validator
+from pydantic import Field, validator, BaseModel
 from typing import Optional
 from datetime import date, time, datetime
 from . import ORMModel
@@ -19,7 +19,7 @@ class AppointmentUpdateRequest(BaseModel):
     comment: Optional[str] = None
 
 class AppointmentStatusUpdate(BaseModel):
-    status: str = Field(..., regex='^(pending|confirmed|canceled|completed|paid)$')
+    status: str = Field(..., pattern='^(pending|confirmed|canceled|completed|paid)$')
 
 class AppointmentResponse(ORMModel):
     id: int
