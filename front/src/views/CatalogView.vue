@@ -3,47 +3,138 @@
     <div class="section-heading">
       <div>
         <h1 class="section-title">Catalog</h1>
-        <p class="section-copy">
-          Product catalog for clinic shop. Cards can later be loaded from your backend with filters,
-          prices, favorite state and stock status.
-        </p>
+        <p class="section-copy">Product catalog for clinic shop. Loaded from server.</p>
       </div>
       <div class="chip-row">
-        <span class="chip">Feed</span>
-        <span class="chip">Supplements</span>
-        <span class="chip">Accessories</span>
+        <span
+          v-for="cat in categories"
+          :key="cat"
+          class="chip"
+          :class="{ active: filters.category === cat }"
+          @click="setCategory(cat)"
+        >{{ cat }}</span>
       </div>
     </div>
 
-    <section class="catalog-grid">
+    <div class="filters row">
+      <input v-model="filters.search" placeholder="Search…" @input="debounceSearch" class="search-input" />
+      <label><input type="checkbox" v-model="filters.in_stock" @change="fetchProducts" /> In stock only</label>
+    </div>
+
+    <div v-if="isLoading" class="muted">Loading products…</div>
+    <p v-if="error" class="error-text">{{ error }}</p>
+
+    <section v-if="products.length" class="catalog-grid">
       <article v-for="product in products" :key="product.id" class="tile">
         <div class="meta-row">
           <span class="chip">{{ product.category }}</span>
-          <strong>{{ product.price }}</strong>
+          <strong>{{ product.price }} BYN</strong>
         </div>
-        <h2 class="card-title">{{ product.title }}</h2>
+        <h2 class="card-title">{{ product.name }}</h2>
         <p class="muted">{{ product.description }}</p>
         <div class="price-row">
-          <span class="muted">{{ product.stock }}</span>
+          <span class="muted">{{ product.stock_quantity > 0 ? 'In stock' : 'Out of stock' }}</span>
           <div class="inline-actions">
-            <button class="button-secondary" type="button">Favorite</button>
-            <button class="button" type="button">Add to cart</button>
+            <button class="button-secondary" type="button" @click="addToFavorites(product.id)">Favorite</button>
+            <button
+              class="button"
+              type="button"
+              @click="addToCart(product.id)"
+              :disabled="product.stock_quantity <= 0"
+            >
+              Add to cart
+            </button>
           </div>
         </div>
       </article>
     </section>
+    <p v-else-if="!isLoading" class="muted">No products found.</p>
   </section>
 </template>
 
 <script>
-import { products } from "../data/mock";
+import productService from '@/services/productService';
+import cartService from '@/services/cartService';
+import favoriteService from '@/services/favoriteService';
 
 export default {
   name: "CatalogView",
   data() {
     return {
-      products,
+      products: [],
+      isLoading: false,
+      error: null,
+      filters: {
+        category: '',
+        search: '',
+        min_price: null,
+        max_price: null,
+        in_stock: false
+      },
+      categories: ['Feed', 'Vitamins', 'Care', 'Accessories'], // статично, можно получать с бэка
+      searchTimer: null,
     };
   },
+  async created() {
+    await this.fetchProducts();
+  },
+  methods: {
+    async fetchProducts() {
+      this.isLoading = true;
+      try {
+        const params = { ...this.filters };
+        if (!params.in_stock) delete params.in_stock;
+        const resp = await productService.getProducts(params);
+        this.products = resp.data.products;
+      } catch (e) {
+        this.error = 'Failed to load products';
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    setCategory(cat) {
+      if (this.filters.category === cat) {
+        this.filters.category = '';
+      } else {
+        this.filters.category = cat;
+      }
+      this.fetchProducts();
+    },
+    debounceSearch() {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => {
+        this.fetchProducts();
+      }, 400);
+    },
+    async addToCart(productId) {
+      try {
+        await cartService.addItem(productId, 1);
+        alert('Added to cart');
+      } catch (e) {
+        alert('Could not add to cart');
+      }
+    },
+    async addToFavorites(productId) {
+      try {
+        await favoriteService.addFavorite('product', productId);
+        alert('Added to favorites');
+      } catch (e) {
+        alert('Could not add to favorites');
+      }
+    }
+  }
 };
 </script>
+<style scoped>
+.error-text { color: #e53e3e; margin: 0.5rem 0; }
+.filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.search-input {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+</style>
