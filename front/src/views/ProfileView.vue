@@ -3,56 +3,53 @@
     <div class="section-heading">
       <div>
         <h1 class="section-title">Profile</h1>
-        <p class="section-copy">
-          Personal cabinet with owner data, pet cards, prescriptions and the next appointments.
-        </p>
+        <p class="section-copy">Personal cabinet with owner data, pet cards, prescriptions.</p>
       </div>
     </div>
 
     <section class="split-grid">
       <article class="panel">
         <h2 class="section-title">Owner card</h2>
-        <div class="form-grid two">
+        <div v-if="profileLoading" class="muted">Loading profile…</div>
+        <p v-if="profileError" class="error-text">{{ profileError }}</p>
+        <div v-if="profile" class="form-grid two">
           <label class="field">
             <span>Full name</span>
-            <input type="text" value="Anna Petrova" />
+            <input type="text" v-model="profile.name" />
           </label>
           <label class="field">
             <span>Phone</span>
-            <input type="text" value="+375 29 456-88-00" />
+            <input type="text" v-model="profile.phone" />
           </label>
           <label class="field">
             <span>Email</span>
-            <input type="email" value="anna@fastpig.by" />
-          </label>
-          <label class="field">
-            <span>City</span>
-            <input type="text" value="Minsk" />
+            <input type="email" v-model="profile.email" />
           </label>
         </div>
         <div class="hero-actions">
-          <button class="button" type="button">Save changes</button>
+          <button class="button" type="button" @click="saveProfile" :disabled="saving">
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
         </div>
+        <p v-if="saveError" class="error-text">{{ saveError }}</p>
       </article>
 
       <article class="panel">
         <h2 class="section-title">Pet cards</h2>
-        <div class="list-column">
-          <article class="feed-card">
+        <div v-if="petsLoading" class="muted">Loading pets…</div>
+        <p v-if="petsError" class="error-text">{{ petsError }}</p>
+        <div v-if="pets.length" class="list-column">
+          <article v-for="pet in pets" :key="pet.id" class="feed-card">
             <div class="meta-row">
-              <strong>Peppa</strong>
-              <span class="chip">Mini pig</span>
+              <strong>{{ pet.name }}</strong>
+              <span class="chip">{{ pet.species }}</span>
             </div>
-            <p class="muted">2 years old, female, allergies noted, vaccine active until Nov 2026.</p>
-          </article>
-          <article class="feed-card">
-            <div class="meta-row">
-              <strong>Boris</strong>
-              <span class="chip">Dog</span>
-            </div>
-            <p class="muted">7 years old, joint care program, next analysis in two weeks.</p>
+            <p class="muted">
+              {{ pet.age || 'Age not set' }}, {{ pet.gender }}, {{ pet.notes }}
+            </p>
           </article>
         </div>
+        <p v-else-if="!petsLoading" class="muted">No pets added.</p>
       </article>
     </section>
 
@@ -77,7 +74,69 @@
 </template>
 
 <script>
+import userService from '@/services/userService';
+import petService from '@/services/petService';
+
 export default {
   name: "ProfileView",
+  data() {
+    return {
+      profile: null,
+      profileLoading: false,
+      profileError: null,
+      saving: false,
+      saveError: null,
+      pets: [],
+      petsLoading: false,
+      petsError: null,
+    };
+  },
+  async created() {
+    await Promise.all([this.fetchProfile(), this.fetchPets()]);
+  },
+  methods: {
+    async fetchProfile() {
+      this.profileLoading = true;
+      try {
+        const resp = await userService.getProfile();
+        this.profile = resp.data;
+      } catch (e) {
+        this.profileError = 'Failed to load profile';
+      } finally {
+        this.profileLoading = false;
+      }
+    },
+    async fetchPets() {
+      this.petsLoading = true;
+      try {
+        const resp = await petService.getMyPets();
+        this.pets = resp.data;
+      } catch (e) {
+        this.petsError = 'Failed to load pets';
+      } finally {
+        this.petsLoading = false;
+      }
+    },
+    async saveProfile() {
+      if (!this.profile) return;
+      this.saving = true;
+      this.saveError = null;
+      try {
+        await userService.updateProfile({
+          name: this.profile.name,
+          phone: this.profile.phone,
+          email: this.profile.email,
+        });
+        alert('Profile updated');
+      } catch (e) {
+        this.saveError = e.response?.data?.detail || 'Failed to update profile';
+      } finally {
+        this.saving = false;
+      }
+    }
+  }
 };
 </script>
+<style scoped>
+.error-text { color: #e53e3e; margin-top: 0.5rem; }
+</style>
