@@ -4,74 +4,31 @@ from .base import safe_commit
 
 
 def list_user_favorites(db: Session, user_id: int):
-    """
-    Возвращает список избранных товаров пользователя.
-    Возвращается список объектов Favorite (с подгруженным продуктом).
-    """
-    return (
-        db.query(models.Favorite)
-        .filter(models.Favorite.user_id == user_id)
-        .all()
-    )
+    return db.query(models.Favorite).filter(models.Favorite.user_id == user_id).all()
 
 
-def add_favorite(db: Session, user_id: int, product_id: int):
-    """
-    Добавляет товар в избранное пользователя.
-    Если запись уже существует – возвращает её без повторного создания.
-    Возвращает объект Favorite.
-    """
-    # Проверяем, не добавлен ли уже этот товар в избранное
-    existing = (
-        db.query(models.Favorite)
-        .filter(
-            models.Favorite.user_id == user_id,
-            models.Favorite.product_id == product_id,
-        )
-        .first()
-    )
-    if existing:
-        return existing
-
-    favorite = models.Favorite(user_id=user_id, product_id=product_id)
-    db.add(favorite)
+def add_favorite(db: Session, user_id: int, entity_type: str, entity_id: int):
+    fav = models.Favorite(user_id=user_id, entity_type=entity_type, entity_id=entity_id)
+    db.add(fav)
     safe_commit(db)
-    db.refresh(favorite)
-    return favorite
+    db.refresh(fav)
+    return fav
+
+def remove_favorite(db: Session, favorite_id: int, user_id: int):
+    fav = db.query(models.Favorite).filter(
+        models.Favorite.id == favorite_id,
+        models.Favorite.user_id == user_id
+    ).first()
+    if fav:
+        db.delete(fav)
+        safe_commit(db)
+        return True
+    return False
 
 
-def remove_favorite(db: Session, user_id: int, product_id: int):
-    """
-    Удаляет товар из избранного пользователя.
-    Возвращает True, если удаление выполнено, иначе False.
-    """
-    favorite = (
-        db.query(models.Favorite)
-        .filter(
-            models.Favorite.user_id == user_id,
-            models.Favorite.product_id == product_id,
-        )
-        .first()
-    )
-    if not favorite:
-        return False
-
-    db.delete(favorite)
-    safe_commit(db)
-    return True
-
-
-def exists_favorite(db: Session, user_id: int, product_id: int) -> bool:
-    """
-    Проверяет, находится ли товар в избранном у пользователя.
-    Возвращает True/False.
-    """
-    return (
-        db.query(models.Favorite)
-        .filter(
-            models.Favorite.user_id == user_id,
-            models.Favorite.product_id == product_id,
-        )
-        .first()
-        is not None
-    )
+def exists_favorite(db: Session, user_id: int, entity_type: str, entity_id: int) -> bool:
+    return db.query(models.Favorite).filter(
+        models.Favorite.user_id == user_id,
+        models.Favorite.entity_type == entity_type,
+        models.Favorite.entity_id == entity_id
+    ).first() is not None

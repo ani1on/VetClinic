@@ -24,8 +24,9 @@
     <div v-if="isLoading" class="muted">Loading products…</div>
     <p v-if="error" class="error-text">{{ error }}</p>
 
-    <section v-if="products.length" class="catalog-grid">
-      <article v-for="product in products" :key="product.id" class="tile">
+    <!-- Сетка товаров — показываем только displayedProducts -->
+    <section v-if="displayedProducts.length" class="catalog-grid">
+      <article v-for="product in displayedProducts" :key="product.id" class="tile">
         <div class="meta-row">
           <span class="chip">{{ product.category }}</span>
           <strong>{{ product.price }} BYN</strong>
@@ -48,7 +49,15 @@
         </div>
       </article>
     </section>
-    <p v-else-if="!isLoading" class="muted">No products found.</p>
+
+    <!-- Кнопка «Загрузить ещё» появляется, если есть скрытые товары -->
+    <div v-if="hasMore" class="load-more-wrapper">
+      <button class="button-secondary" @click="loadMore" :disabled="loadingMore">
+        {{ loadingMore ? 'Loading…' : 'Load more' }}
+      </button>
+    </div>
+
+    <p v-if="!isLoading && !allProducts.length" class="muted">No products found.</p>
   </section>
 </template>
 
@@ -61,8 +70,10 @@ export default {
   name: "CatalogView",
   data() {
     return {
-      products: [],
+      allProducts: [],          // все загруженные товары с сервера
+      displayedProducts: [],    // те, что сейчас показаны
       isLoading: false,
+      loadingMore: false,
       error: null,
       filters: {
         category: '',
@@ -71,9 +82,17 @@ export default {
         max_price: null,
         in_stock: false
       },
-      categories: ['Feed', 'Vitamins', 'Care', 'Accessories'], // статично, можно получать с бэка
+      categories: ['Feed', 'Vitamins', 'Care', 'Accessories'],
       searchTimer: null,
+      visibleCount: 0,          // сколько товаров уже отображено
+      initialLoad: 6,           // первая порция
+      loadBatch: 2,             // последующие порции
     };
+  },
+  computed: {
+    hasMore() {
+      return this.visibleCount < this.allProducts.length;
+    }
   },
   async created() {
     await this.fetchProducts();
@@ -81,16 +100,37 @@ export default {
   methods: {
     async fetchProducts() {
       this.isLoading = true;
+      this.error = null;
       try {
         const params = { ...this.filters };
         if (!params.in_stock) delete params.in_stock;
         const resp = await productService.getProducts(params);
-        this.products = resp.data.products;
+        this.allProducts = resp.data.products || resp.data;
+        // сбрасываем счётчик
+        this.visibleCount = 0;
+        this.displayedProducts = [];
+        // показываем первую порцию
+        this.showNext(this.initialLoad);
       } catch (e) {
         this.error = 'Failed to load products';
+        this.allProducts = [];
       } finally {
         this.isLoading = false;
       }
+    },
+    // добавляет к отображаемым товарам указанное количество из allProducts
+    showNext(count) {
+      const next = this.allProducts.slice(this.visibleCount, this.visibleCount + count);
+      this.displayedProducts.push(...next);
+      this.visibleCount += next.length;
+    },
+    loadMore() {
+      this.loadingMore = true;
+      // небольшая задержка для имитации сетевого запроса (можно убрать)
+      setTimeout(() => {
+        this.showNext(this.loadBatch);
+        this.loadingMore = false;
+      }, 300);
     },
     setCategory(cat) {
       if (this.filters.category === cat) {
@@ -125,6 +165,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .error-text { color: #e53e3e; margin: 0.5rem 0; }
 .filters {
@@ -136,5 +177,10 @@ export default {
   padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid var(--line);
+}
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 </style>

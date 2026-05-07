@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import Field, BaseModel
 from typing import Optional, List
 from datetime import date, time
 from . import ORMModel
@@ -27,3 +27,19 @@ class DoctorScheduleResponse(ORMModel):
 class SlotResponse(ORMModel):
     time: time
     available: bool
+
+
+class DoctorCreateRequest(BaseModel):
+    user_id: int = Field(..., description="ID пользователя")
+    full_name: str = Field(..., max_length=150)
+    specialization: Optional[str] = None
+    description: Optional[str] = None
+    photo_url: Optional[str] = None
+    is_active: bool = True
+
+class DoctorUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    specialization: Optional[str] = None
+    description: Optional[str] = None
+    photo_url: Optional[str] = None
+    is_active: Optional[bool] = None

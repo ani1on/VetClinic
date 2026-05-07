@@ -17,7 +17,7 @@
         <p v-if="formError" class="error-text">{{ formError }}</p>
         <div v-else class="form-grid two">
           <label class="field">
-            <span>Pet</span>
+            <span>Pet *</span>
             <select v-model="newAppointment.pet_id">
               <option disabled value="">Select pet</option>
               <option v-for="pet in pets" :key="pet.id" :value="pet.id">
@@ -26,7 +26,7 @@
             </select>
           </label>
           <label class="field">
-            <span>Service</span>
+            <span>Service *</span>
             <select v-model="newAppointment.service_id">
               <option disabled value="">Select service</option>
               <option v-for="srv in services" :key="srv.id" :value="srv.id">
@@ -35,11 +35,21 @@
             </select>
           </label>
           <label class="field">
-            <span>Date</span>
-            <input type="date" v-model="newAppointment.appointment_date" />
+            <span>Doctor</span>
+            <select v-model="newAppointment.doctor_id">
+              <option :value="null">Any doctor</option>
+              <option v-for="doc in doctors" :key="doc.id" :value="doc.id">
+                {{ doc.full_name }} ({{ doc.specialization || 'General' }})
+              </option>
+            </select>
           </label>
           <label class="field">
-            <span>Time</span>
+            <span>Date *</span>
+            <input type="date" v-model="newAppointment.appointment_date" />
+          </label>
+          <label class="field" />
+          <label class="field">
+            <span>Time *</span>
             <input type="time" v-model="newAppointment.appointment_time" />
           </label>
         </div>
@@ -63,13 +73,13 @@
         <div v-if="appointments.length" class="list-column">
           <article v-for="item in appointments" :key="item.id" class="feed-card">
             <div class="meta-row">
-              <strong>{{ item.pet?.name || item.pet_id }} – {{ item.service?.name || item.service_id }}</strong>
+              <strong>{{ getPetName(item.pet_id) }} – {{ getServiceName(item.service_id) }}</strong>
               <span class="chip">{{ item.status }}</span>
             </div>
-            <p class="muted">{{ item.appointment_date }} at {{ item.appointment_time }} with {{ item.doctor?.full_name || 'doctor' }}</p>
+            <p class="muted">{{ item.appointment_date }} at {{ item.appointment_time }} with {{ getDoctorName(item.doctor_id) }}</p>
             <div class="inline-actions">
               <button
-                v-if="item.status !== 'canceled' && item.status !== 'completed'"
+                v-if="item.status !== 'canceled' && item.status !== 'completed' && item.status !== 'paid'"
                 class="button-secondary"
                 @click="cancelAppointment(item.id)"
                 :disabled="cancelling === item.id"
@@ -89,6 +99,7 @@
 import appointmentService from '@/services/appointmentService';
 import petService from '@/services/petService';
 import serviceService from '@/services/serviceService';
+import doctorService from '@/services/doctorService';
 
 export default {
   name: "AppointmentView",
@@ -98,12 +109,14 @@ export default {
       newAppointment: {
         pet_id: '',
         service_id: '',
+        doctor_id: null,
         appointment_date: '',
         appointment_time: '',
         comment: ''
       },
       pets: [],
       services: [],
+      doctors: [],
       formLoading: false,
       formError: null,
       appointmentSaving: false,
@@ -112,7 +125,7 @@ export default {
       appointments: [],
       apptsLoading: false,
       apptsError: null,
-      cancelling: null,    // id записи в процессе отмены
+      cancelling: null,
     };
   },
   async created() {
@@ -122,14 +135,16 @@ export default {
     async fetchFormData() {
       this.formLoading = true;
       try {
-        const [petsResp, servicesResp] = await Promise.all([
+        const [petsResp, servicesResp, doctorsResp] = await Promise.all([
           petService.getMyPets(),
-          serviceService.getServices()
+          serviceService.getServices(),
+          doctorService.getAll()
         ]);
         this.pets = petsResp.data;
         this.services = servicesResp.data;
+        this.doctors = doctorsResp.data;
       } catch (e) {
-        this.formError = 'Failed to load pets or services';
+        this.formError = 'Failed to load pets, services or doctors';
       } finally {
         this.formLoading = false;
       }
@@ -145,14 +160,41 @@ export default {
         this.apptsLoading = false;
       }
     },
+    // Вспомогательные методы для получения имён по ID
+    getPetName(petId) {
+      const pet = this.pets.find(p => p.id === petId);
+      return pet ? pet.name : `Pet #${petId}`;
+    },
+    getServiceName(serviceId) {
+      const srv = this.services.find(s => s.id === serviceId);
+      return srv ? srv.name : `Service #${serviceId}`;
+    },
+    getDoctorName(doctorId) {
+      if (!doctorId) return 'any doctor';
+      const doc = this.doctors.find(d => d.id === doctorId);
+      return doc ? doc.full_name : `Doctor #${doctorId}`;
+    },
     async createAppointment() {
+      if (!this.newAppointment.pet_id || !this.newAppointment.service_id ||
+          !this.newAppointment.appointment_date || !this.newAppointment.appointment_time) {
+        this.submitError = 'Please fill all required fields (pet, service, date, time)';
+        return;
+      }
+
       this.appointmentSaving = true;
       this.submitError = null;
       try {
-        await appointmentService.createAppointment(this.newAppointment);
+        const payload = {
+          ...this.newAppointment,
+          doctor_id: this.newAppointment.doctor_id ? parseInt(this.newAppointment.doctor_id) : null
+        };
+        await appointmentService.createAppointment(payload);
         // сброс формы
-        this.newAppointment = { pet_id: '', service_id: '', appointment_date: '', appointment_time: '', comment: '' };
-        await this.fetchAppointments(); // обновить список
+        this.newAppointment = {
+          pet_id: '', service_id: '', doctor_id: null,
+          appointment_date: '', appointment_time: '', comment: ''
+        };
+        await this.fetchAppointments();
       } catch (e) {
         this.submitError = e.response?.data?.detail || 'Failed to create appointment';
       } finally {
@@ -173,6 +215,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .error-text { color: #e53e3e; margin-top: 0.5rem; }
 </style>

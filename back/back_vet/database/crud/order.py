@@ -7,33 +7,16 @@ def get_cart(db: Session, user_id: int):
     return db.query(models.CartItem).filter(models.CartItem.user_id == user_id).all()
 
 
-def add_cart_item(db: Session, user_id: int, payload: dict):
-    """
-    Добавляет товар в корзину.
-    Если товар уже есть у пользователя – увеличивает количество, иначе создаёт новую запись.
-    payload должен содержать product_id (обязательно) и quantity (по умолчанию 1).
-    """
-    product_id = payload.get("product_id")
-    quantity = payload.get("quantity", 1)
-
-    if not product_id:
-        raise ValueError("product_id is required")
-
-    existing = (
-        db.query(models.CartItem)
-        .filter(
-            models.CartItem.user_id == user_id,
-            models.CartItem.product_id == product_id,
-        )
-        .first()
-    )
-
+def add_cart_item(db: Session, user_id: int, product_id: int, quantity: int):
+    existing = db.query(models.CartItem).filter(
+        models.CartItem.user_id == user_id,
+        models.CartItem.product_id == product_id
+    ).first()
     if existing:
         existing.quantity += quantity
         safe_commit(db)
         db.refresh(existing)
         return existing
-
     item = models.CartItem(user_id=user_id, product_id=product_id, quantity=quantity)
     db.add(item)
     safe_commit(db)
@@ -41,36 +24,28 @@ def add_cart_item(db: Session, user_id: int, payload: dict):
     return item
 
 
-def update_cart_item(db: Session, cart_item_id: int, payload: dict):
-    """
-    Обновляет количество товара в корзине по ID записи.
-    payload может содержать 'quantity'.
-    Возвращает обновлённый объект или None.
-    """
-    item = db.query(models.CartItem).filter(models.CartItem.id == cart_item_id).first()
-    if not item:
-        return None
-
-    if "quantity" in payload:
-        item.quantity = payload["quantity"]
-
-    safe_commit(db)
-    db.refresh(item)
+def update_cart_item(db: Session, item_id: int, quantity: int, user_id: int):
+    item = db.query(models.CartItem).filter(
+        models.CartItem.id == item_id,
+        models.CartItem.user_id == user_id
+    ).first()
+    if item:
+        item.quantity = quantity
+        safe_commit(db)
+        db.refresh(item)
     return item
 
 
-def remove_cart_item(db: Session, cart_item_id: int):
-    """
-    Удаляет запись из корзины по ID.
-    Возвращает True, если удаление прошло успешно, иначе False.
-    """
-    item = db.query(models.CartItem).filter(models.CartItem.id == cart_item_id).first()
-    if not item:
-        return False
-
-    db.delete(item)
-    safe_commit(db)
-    return True
+def remove_cart_item(db: Session, item_id: int, user_id: int):
+    item = db.query(models.CartItem).filter(
+        models.CartItem.id == item_id,
+        models.CartItem.user_id == user_id
+    ).first()
+    if item:
+        db.delete(item)
+        safe_commit(db)
+        return True
+    return False
 
 
 def create_order(db: Session, user_id: int):

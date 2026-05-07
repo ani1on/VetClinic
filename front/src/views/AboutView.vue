@@ -27,6 +27,22 @@
         <p class="muted">{{ fact.description }}</p>
       </article>
     </section>
+
+    <!-- Блок с социальными сетями -->
+    <section class="social-section">
+      <h2 class="section-title">Follow us</h2>
+      <div class="social-links">
+        <a href="https://www.instagram.com/ani1onn" class="social-link instagram">
+          <span class="social-icon">📷</span> Instagram
+        </a>
+        <a href="https://web.telegram.org/ani1on" class="social-link telegram">
+          <span class="social-icon">📨</span> Telegram
+        </a>
+        <a href="https://vk.com/v_vrrrrrrrrrrrrrrrrtoi" class="social-link vk">
+          <span class="social-icon">🔵</span> VK
+        </a>
+      </div>
+    </section>
   </section>
 </template>
 
@@ -66,6 +82,39 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .error-text { color: #e53e3e; }
+
+/* Стили для блока соцсетей */
+.social-section {
+  margin-top: 32px;
+  text-align: center;
+}
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 12px;
+}
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.2s, color 0.2s;
+}
+.social-link:hover {
+  background: var(--text);
+  color: #fff;
+}
+.social-icon {
+  font-size: 1.2rem;
+}
 </style>

@@ -20,7 +20,7 @@ export default {
     return apiClient.delete(`/appointments/${id}`);
   },
   // admin
-  getAllAppointments() {
-    return apiClient.get('/appointments/admin/all');
-  }
+getAllAppointments() {
+  return apiClient.get('/appointments/admin/all');
+}
 };

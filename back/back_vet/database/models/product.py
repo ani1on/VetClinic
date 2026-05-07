@@ -15,6 +15,11 @@ class Product(Base):
     stock_quantity = Column(Integer, default=0)
     is_available = Column(Boolean, default=True)
     image_url = Column(String(300))
-    favorites = relationship("Favorite", back_populates="product", cascade="all, delete-orphan")
+    favorites = relationship(
+        "Favorite",
+        primaryjoin="and_(Product.id == Favorite.entity_id, Favorite.entity_type == 'product')",
+        foreign_keys="[Favorite.entity_id]",
+        viewonly=True
+    )
     cart_items = relationship("CartItem", back_populates="product")
     order_items = relationship("OrderItem", back_populates="product")

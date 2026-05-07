@@ -18,5 +18,8 @@ export default {
   },
   getPetHistory(petId) {
     return apiClient.get(`/pets/${petId}/history`);
-  }
+  },
+  getAllPets() {
+  return apiClient.get('/pets/all'); // если у вас есть такой эндпоинт, иначе временно заглушка
+}
 };

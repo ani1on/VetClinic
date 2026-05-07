@@ -15,7 +15,7 @@
 
       <nav class="main-nav" :class="{ open: isMenuOpen }">
         <router-link
-          v-for="item in navigation"
+          v-for="item in filteredNavigation"
           :key="item.to"
           :to="item.to"
           class="nav-link"
@@ -59,7 +59,8 @@ export default {
     return {
       isMenuOpen: false,
       authState: authState,
-      navigation: [
+      // Полный список всех пунктов меню
+      allNavigation: [
         { label: "Home", to: "/" },
         { label: "Catalog", to: "/catalog" },
         { label: "Profile", to: "/profile" },
@@ -69,6 +70,15 @@ export default {
         { label: "Admin", to: "/admin" },
       ],
     };
+  },
+  computed: {
+    // Отфильтрованное меню: пункт Admin показываем только для администраторов
+    filteredNavigation() {
+      if (!this.authState.isAuthenticated || this.authState.user?.role !== 'admin') {
+        return this.allNavigation.filter(item => item.to !== '/admin');
+      }
+      return this.allNavigation;
+    }
   },
   methods: {
     goToAuth() {
@@ -83,7 +93,6 @@ export default {
   },
 };
 </script>
-
 <!-- Стили остаются без изменений -->
 <style>
 :root {
