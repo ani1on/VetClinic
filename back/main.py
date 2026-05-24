@@ -23,3 +23,6 @@ app.include_router(token.router)
 def startup():
     from .back_vet.database.core import init_db
     init_db()
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
