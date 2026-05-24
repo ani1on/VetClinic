@@ -32,10 +32,10 @@ class AppointmentResponse(ORMModel):
     comment: Optional[str]
     status: str
     created_at: datetime
-    # связанные объекты (можно возвращать по желанию)
+
     service: Optional[ServiceResponse] = None
     doctor: Optional[DoctorResponse] = None
-    # pet? не перегружаем, но можно
+
 
 class AppointmentListResponse(ORMModel):
     total: int

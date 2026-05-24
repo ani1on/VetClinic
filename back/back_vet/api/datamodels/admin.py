@@ -14,4 +14,4 @@ class DashboardMetricsResponse(ORMModel):
 
 class AppointmentsStatsResponse(ORMModel):
     total: int
-    by_status: List[Dict[str, Any]]   # [{status: "pending", count: 5}, ...]
+    by_status: List[Dict[str, Any]]   

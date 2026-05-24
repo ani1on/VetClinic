@@ -2,42 +2,42 @@
   <section class="page">
     <div class="section-heading">
       <div>
-        <h1 class="section-title">Favorites</h1>
-        <p class="section-copy">Your saved products, services and doctors.</p>
+        <h1 class="section-title">Избранное</h1>
+        <p class="section-copy">Сохранённые товары, услуги и врачи.</p>
       </div>
     </div>
 
-    <div v-if="isLoading" class="muted">Loading favorites…</div>
+    <div v-if="isLoading" class="muted">Загрузка избранного…</div>
     <p v-if="error" class="error-text">{{ error }}</p>
 
     <section v-if="favorites.length" class="favorites-grid">
       <article v-for="item in favorites" :key="item.id" class="tile">
         <div class="meta-row">
           <h2 class="card-title">{{ getEntityName(item) }}</h2>
-          <span class="chip">{{ item.entity_type }}</span>
+          <span class="chip">{{ translateEntityType(item.entity_type) }}</span>
         </div>
-        <p class="muted">Saved on {{ new Date(item.created_at).toLocaleDateString() }}</p>
+        <p class="muted">Сохранено: {{ new Date(item.created_at).toLocaleDateString() }}</p>
 
-        <!-- Детали (раскрываются по Open) -->
+        <!-- Детали -->
         <div v-if="expandedId === item.id" class="entity-details">
           <p v-if="getEntityDetail(item).description" class="muted">
             {{ getEntityDetail(item).description }}
           </p>
           <div class="detail-props" v-if="getEntityDetail(item).price != null">
-            <span class="label">Price:</span>
+            <span class="label">Цена:</span>
             <span>{{ getEntityDetail(item).price }} BYN</span>
           </div>
           <div class="detail-props" v-if="getEntityDetail(item).category">
-            <span class="label">Category:</span>
+            <span class="label">Категория:</span>
             <span>{{ getEntityDetail(item).category }}</span>
           </div>
           <div class="detail-props" v-if="getEntityDetail(item).specialization">
-            <span class="label">Specialization:</span>
+            <span class="label">Специализация:</span>
             <span>{{ getEntityDetail(item).specialization }}</span>
           </div>
           <div class="detail-props" v-if="getEntityDetail(item).duration_minutes">
-            <span class="label">Duration:</span>
-            <span>{{ getEntityDetail(item).duration_minutes }} min</span>
+            <span class="label">Длительность:</span>
+            <span>{{ getEntityDetail(item).duration_minutes }} мин</span>
           </div>
         </div>
 
@@ -47,16 +47,16 @@
             type="button"
             @click="toggleDetails(item.id)"
           >
-            {{ expandedId === item.id ? 'Close' : 'Open' }}
+            {{ expandedId === item.id ? 'Закрыть' : 'Открыть' }}
           </button>
           <button class="button" type="button" @click="removeFavorite(item.id)">
-            Remove
+            Удалить
           </button>
         </div>
       </article>
     </section>
 
-    <p v-else-if="!isLoading" class="muted">No favorites yet.</p>
+    <p v-else-if="!isLoading" class="muted">Пока нет избранного.</p>
   </section>
 </template>
 
@@ -73,7 +73,6 @@ export default {
       favorites: [],
       isLoading: false,
       error: null,
-      // справочники
       allProducts: [],
       allServices: [],
       allDoctors: [],
@@ -84,13 +83,50 @@ export default {
     await Promise.all([this.fetchFavorites(), this.loadReferenceData()]);
   },
   methods: {
+    // Улучшенный парсинг ошибок с обработкой сетевых ошибок и 5xx
+    parseApiError(error) {
+      if (!error.response) {
+        return 'Не удалось соединиться с сервером. Проверьте подключение к интернету.';
+      }
+      const status = error.response.status;
+      if (status >= 500 && status <= 503) {
+        return 'Сервер временно недоступен. Попробуйте позже.';
+      }
+      const data = error.response.data;
+      if (data) {
+        if (Array.isArray(data) && data[0]?.loc) {
+          const messages = data.map(err => {
+            const field = err.loc[err.loc.length - 1];
+            return `Поле "${field}": ${err.msg}`;
+          });
+          return messages.join('; ');
+        }
+        if (data.detail) {
+          if (typeof data.detail === 'string') return data.detail;
+          if (Array.isArray(data.detail)) return data.detail.map(d => d.msg).join('; ');
+        }
+        if (data.message) return data.message;
+      }
+      return 'Произошла ошибка. Попробуйте обновить страницу.';
+    },
+
+    translateEntityType(type) {
+      const map = {
+        product: 'Товар',
+        service: 'Услуга',
+        doctor: 'Врач'
+      };
+      return map[type] || type;
+    },
+
     async fetchFavorites() {
       this.isLoading = true;
+      this.error = null;
       try {
         const resp = await favoriteService.getFavorites();
         this.favorites = resp.data;
       } catch (e) {
-        this.error = 'Failed to load favorites';
+        this.error = this.parseApiError(e);
       } finally {
         this.isLoading = false;
       }
@@ -103,21 +139,17 @@ export default {
           serviceService.getServices(),
           doctorService.getAll()
         ]);
-
-        // catalog возвращает { total, products }
         this.allProducts = productsResp.data.products || productsResp.data || [];
-        // services возвращает массив
         this.allServices = Array.isArray(servicesResp.data) ? servicesResp.data : [];
-        // doctors тоже массив
         this.allDoctors = Array.isArray(doctorsResp.data) ? doctorsResp.data : [];
       } catch (e) {
-        console.warn('Failed to load reference data for favorites', e);
+        console.warn('Не удалось загрузить справочные данные для избранного', e);
       }
     },
 
     getEntityName(item) {
       const info = this.getEntityInfo(item);
-      return info ? info.name : `${item.entity_type} #${item.entity_id}`;
+      return info ? info.name : `${this.translateEntityType(item.entity_type)} #${item.entity_id}`;
     },
 
     getEntityDetail(item) {
@@ -166,12 +198,13 @@ export default {
     },
 
     async removeFavorite(id) {
+      this.error = null;
       try {
         await favoriteService.removeFavorite(id);
         this.favorites = this.favorites.filter(f => f.id !== id);
         if (this.expandedId === id) this.expandedId = null;
       } catch (e) {
-        alert('Could not remove');
+        this.error = this.parseApiError(e);
       }
     }
   }

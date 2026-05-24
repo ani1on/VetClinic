@@ -8,7 +8,7 @@ class Favorite(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    entity_type = Column(String(50), nullable=False)   # тип: product, service, doctor
+    entity_type = Column(String(50), nullable=False)  
     entity_id = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 

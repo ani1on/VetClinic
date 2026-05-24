@@ -6,7 +6,6 @@ class ORMModel(BaseModel):
     class Config:
         from_attributes = True
 
-# Импортируем все модули схем, чтобы они были доступны как атрибуты пакета
 from . import auth
 from . import user
 from . import admin

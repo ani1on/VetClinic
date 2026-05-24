@@ -49,7 +49,7 @@ def remove_cart_item(db: Session, item_id: int, user_id: int):
 
 
 def create_order(db: Session, user_id: int):
-    """Создаёт заказ из текущей корзины пользователя."""
+
     cart = get_cart(db, user_id)
 
     if not cart:
@@ -86,25 +86,22 @@ def create_order(db: Session, user_id: int):
 
 
 def create_order_from_cart(db: Session, user_id: int):
-    """Псевдоним для create_order – создаёт заказ из корзины."""
+
     return create_order(db, user_id)
 
 
 def list_user_orders(db: Session, user_id: int):
-    """Возвращает все заказы пользователя."""
+
     return db.query(models.Order).filter(models.Order.user_id == user_id).all()
 
 
 def get_order_by_id(db: Session, order_id: int):
-    """Возвращает заказ по ID или None."""
+
     return db.query(models.Order).filter(models.Order.id == order_id).first()
 
 
 def update_order_status(db: Session, order_id: int, status: str):
-    """
-    Обновляет статус заказа.
-    Возвращает обновлённый объект или None, если заказ не найден.
-    """
+
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if not order:
         return None

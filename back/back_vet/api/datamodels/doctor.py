@@ -12,7 +12,7 @@ class DoctorResponse(ORMModel):
     is_active: bool
 
 class DoctorDetailResponse(DoctorResponse):
-    # можно добавить расписание
+
     schedules: Optional[List['DoctorScheduleResponse']] = []
 
 class DoctorScheduleResponse(ORMModel):

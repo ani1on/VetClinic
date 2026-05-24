@@ -7,11 +7,16 @@ export default {
   updateProfile(data) {
     return apiClient.put('/users/profile', data);
   },
-  // админские методы (если нужно)
   getUser(userId) {
     return apiClient.get(`/users/${userId}`);
   },
   listUsers(params) {
     return apiClient.get('/users/', { params });
-  }
+  },
+  updateUserRole(userId, data) {
+  return apiClient.patch(`/users/${userId}/role`, data);
+},
+deleteUser(userId) {
+  return apiClient.delete(`/users/${userId}`);
+}
 };

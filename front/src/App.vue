@@ -9,22 +9,21 @@
         </div>
       </div>
 
-      <button class="menu-toggle" type="button" @click="isMenuOpen = !isMenuOpen">
-        {{ isMenuOpen ? "Close" : "Menu" }}
+      <button class="menu-toggle" type="button" @click="isMenuOpen = true">
+        Menu
       </button>
 
-      <nav class="main-nav" :class="{ open: isMenuOpen }">
+      <!-- Десктопная навигация (остаётся без изменений) -->
+      <nav class="main-nav desktop-nav">
         <router-link
           v-for="item in filteredNavigation"
           :key="item.to"
           :to="item.to"
           class="nav-link"
-          @click="isMenuOpen = false"
         >
           {{ item.label }}
         </router-link>
 
-        <!-- Динамическая кнопка авторизации -->
         <a
           v-if="!authState.isAuthenticated"
           class="nav-link"
@@ -44,6 +43,46 @@
       </nav>
     </header>
 
+    <!-- Мобильный выдвижной ящик (drawer) -->
+    <transition name="drawer-fade">
+      <div v-if="isMenuOpen" class="drawer-overlay" @click="isMenuOpen = false"></div>
+    </transition>
+    <transition name="drawer-slide">
+      <div v-if="isMenuOpen" class="drawer">
+        <div class="drawer-header">
+          <span class="drawer-title">Меню</span>
+          <button class="drawer-close" @click="isMenuOpen = false">✕</button>
+        </div>
+        <nav class="drawer-nav">
+          <router-link
+            v-for="item in filteredNavigation"
+            :key="item.to"
+            :to="item.to"
+            class="drawer-nav-link"
+            @click="isMenuOpen = false"
+          >
+            {{ item.label }}
+          </router-link>
+          <a
+            v-if="!authState.isAuthenticated"
+            class="drawer-nav-link"
+            href="#"
+            @click.prevent="goToAuth"
+          >
+            Auth
+          </a>
+          <a
+            v-else
+            class="drawer-nav-link"
+            href="#"
+            @click.prevent="handleLogout"
+          >
+            Logout
+          </a>
+        </nav>
+      </div>
+    </transition>
+
     <main class="page-content">
       <router-view />
     </main>
@@ -59,20 +98,18 @@ export default {
     return {
       isMenuOpen: false,
       authState: authState,
-      // Полный список всех пунктов меню
       allNavigation: [
         { label: "Home", to: "/" },
         { label: "Catalog", to: "/catalog" },
         { label: "Profile", to: "/profile" },
         { label: "Appointment", to: "/appointment" },
-        { label: "Favorits", to: "/favorits" },
+        { label: "Favorites", to: "/favorits" },   // исправлено
         { label: "About", to: "/about" },
         { label: "Admin", to: "/admin" },
       ],
     };
   },
   computed: {
-    // Отфильтрованное меню: пункт Admin показываем только для администраторов
     filteredNavigation() {
       if (!this.authState.isAuthenticated || this.authState.user?.role !== 'admin') {
         return this.allNavigation.filter(item => item.to !== '/admin');
@@ -80,7 +117,20 @@ export default {
       return this.allNavigation;
     }
   },
+  watch: {
+    $route(to) {
+      this.redirectIfAuthOnAuthPage(to);
+    }
+  },
+  mounted() {
+    this.redirectIfAuthOnAuthPage(this.$route);
+  },
   methods: {
+    redirectIfAuthOnAuthPage(route) {
+      if (this.authState.isAuthenticated && route.path === '/auth') {
+        this.$router.push('/');
+      }
+    },
     goToAuth() {
       this.isMenuOpen = false;
       this.$router.push('/auth');
@@ -93,8 +143,9 @@ export default {
   },
 };
 </script>
-<!-- Стили остаются без изменений -->
+
 <style>
+/* ===== существующие переменные и общие стили (оставлены без изменений) ===== */
 :root {
   --bg: #fffaf4;
   --bg-strong: #ffe8d6;
@@ -197,7 +248,8 @@ textarea {
   font-weight: 800;
 }
 
-.main-nav {
+/* Десктопная навигация (видна только на широких экранах) */
+.main-nav.desktop-nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -217,6 +269,7 @@ textarea {
   color: #fff;
 }
 
+/* Кнопка меню (показывается только на мобильных) */
 .menu-toggle {
   display: none;
   padding: 10px 16px;
@@ -224,20 +277,120 @@ textarea {
   border-radius: 999px;
   background: var(--text);
   color: #fff;
+  cursor: pointer;
 }
 
+/* ===== Стили для выдвижного ящика (drawer) ===== */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85%);
+  background: var(--surface-strong);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-left: 1px solid var(--line);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.drawer-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.drawer-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0;
+  line-height: 1;
+}
+
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.drawer-nav-link {
+  padding: 12px 16px;
+  border-radius: 20px;
+  color: var(--text);
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.drawer-nav-link.router-link-exact-active,
+.drawer-nav-link:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Анимации */
+.drawer-fade-enter-active,
+.drawer-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.drawer-fade-enter-from,
+.drawer-fade-leave-to {
+  opacity: 0;
+}
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  transition: transform 0.25s ease;
+}
+.drawer-slide-enter-from,
+.drawer-slide-leave-to {
+  transform: translateX(100%);
+}
+
+/* ===== Адаптивность ===== */
+@media (max-width: 980px) {
+  .main-nav.desktop-nav {
+    display: none;
+  }
+  .menu-toggle {
+    display: inline-flex;
+  }
+}
+
+/* остальные существующие медиа-запросы (можно оставить без изменений) */
 .page-content {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
-
 .page {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
-
 .hero-card,
 .panel,
 .tile,
@@ -248,7 +401,6 @@ textarea {
   background: var(--surface);
   box-shadow: var(--shadow);
 }
-
 .hero-card {
   position: relative;
   overflow: hidden;
@@ -257,7 +409,6 @@ textarea {
   gap: 24px;
   padding: 32px;
 }
-
 .hero-card::after {
   content: "";
   position: absolute;
@@ -267,13 +418,11 @@ textarea {
   border-radius: 50%;
   background: rgba(255, 122, 89, 0.13);
 }
-
 .hero-title {
   margin: 0;
   font-size: clamp(2.2rem, 4vw, 4.6rem);
   line-height: 0.95;
 }
-
 .hero-subtitle {
   margin: 14px 0 0;
   max-width: 620px;
@@ -281,7 +430,6 @@ textarea {
   font-size: 1.05rem;
   line-height: 1.7;
 }
-
 .hero-actions,
 .inline-actions {
   display: flex;
@@ -289,7 +437,6 @@ textarea {
   gap: 12px;
   margin-top: 24px;
 }
-
 .button,
 .button-secondary {
   display: inline-flex;
@@ -299,24 +446,20 @@ textarea {
   border-radius: 999px;
   font-weight: 700;
 }
-
 .button {
   border: 0;
   background: linear-gradient(135deg, var(--primary), #ffb26b);
   color: #fff;
 }
-
 .button-secondary {
   border: 1px solid var(--line);
   background: #fff;
   color: var(--text);
 }
-
 .hero-aside {
   display: grid;
   gap: 14px;
 }
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -328,7 +471,6 @@ textarea {
   color: var(--accent);
   font-weight: 700;
 }
-
 .stats-grid,
 .tile-grid,
 .split-grid,
@@ -340,19 +482,15 @@ textarea {
   display: grid;
   gap: 18px;
 }
-
 .stats-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-
 .tile-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-
 .split-grid {
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
 }
-
 .catalog-grid,
 .favorites-grid,
 .schedule-grid,
@@ -360,52 +498,44 @@ textarea {
 .about-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-
 .stat-card,
 .tile,
 .panel,
 .feed-card {
   padding: 24px;
 }
-
 .stat-value {
   margin: 0;
   font-size: 2rem;
   font-weight: 800;
 }
-
 .stat-label,
 .muted {
   margin: 8px 0 0;
   color: var(--muted);
   line-height: 1.6;
 }
-
 .section-heading {
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: 16px;
 }
-
 .section-title {
   margin: 0;
   font-size: 1.8rem;
 }
-
 .section-copy {
   margin: 8px 0 0;
   color: var(--muted);
   max-width: 700px;
   line-height: 1.7;
 }
-
 .chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .chip {
   padding: 8px 12px;
   border-radius: 999px;
@@ -414,7 +544,6 @@ textarea {
   font-size: 0.95rem;
   font-weight: 700;
 }
-
 .price-row,
 .meta-row,
 .list-row {
@@ -423,43 +552,35 @@ textarea {
   justify-content: space-between;
   gap: 12px;
 }
-
 .list-column {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
-
 .divider {
   height: 1px;
   background: var(--line);
 }
-
 .mini-title,
 .card-title {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 800;
 }
-
 .form-grid {
   display: grid;
   gap: 14px;
 }
-
 .form-grid.two {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-
 .field {
   display: grid;
   gap: 8px;
 }
-
 .field span {
   font-weight: 700;
 }
-
 .field input,
 .field select,
 .field textarea {
@@ -470,33 +591,27 @@ textarea {
   background: rgba(255, 255, 255, 0.92);
   color: var(--text);
 }
-
 .field textarea {
   min-height: 110px;
   resize: vertical;
 }
-
 .feed-card {
   display: grid;
   gap: 12px;
 }
-
 .kpi {
   margin: 0;
   font-size: 2.3rem;
   font-weight: 800;
 }
-
 .soft {
   padding: 16px;
   border-radius: 18px;
   background: rgba(255, 122, 89, 0.08);
 }
-
 .success {
   background: rgba(58, 161, 126, 0.12);
 }
-
 .warn {
   background: rgba(255, 208, 122, 0.25);
 }
@@ -514,25 +629,9 @@ textarea {
   .form-grid.two {
     grid-template-columns: 1fr;
   }
-
   .topbar {
     align-items: flex-start;
     border-radius: 28px;
-  }
-
-  .menu-toggle {
-    display: inline-flex;
-  }
-
-  .main-nav {
-    display: none;
-    width: 100%;
-    justify-content: flex-start;
-    padding-top: 8px;
-  }
-
-  .main-nav.open {
-    display: flex;
   }
 }
 
@@ -541,7 +640,6 @@ textarea {
     width: min(100% - 20px, 1200px);
     padding-top: 12px;
   }
-
   .topbar,
   .hero-card,
   .panel,
@@ -550,7 +648,6 @@ textarea {
   .feed-card {
     padding: 18px;
   }
-
   .brand-link {
     font-size: 1.25rem;
   }

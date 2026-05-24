@@ -18,4 +18,4 @@ class CartItemResponse(ORMModel):
 
 class CartResponse(ORMModel):
     items: list[CartItemResponse]
-    total_price: float = 0.0   # можно вычислить на бэке
+    total_price: float = 0.0   

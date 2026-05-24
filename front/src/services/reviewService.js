@@ -9,5 +9,9 @@ export default {
   },
   moderateReview(id, status) {
     return apiClient.patch(`/reviews/${id}/moderate`, { status });
-  }
+  },
+   deleteReview(id) {
+    return apiClient.delete(`/reviews/${id}`);
+  },
+
 };

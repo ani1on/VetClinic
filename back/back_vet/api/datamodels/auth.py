@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import datetime
 from . import ORMModel
 
-# ---- Запросы ----
+
 class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     phone: str = Field(..., pattern=r'^\+?\d{10,15}$')
@@ -32,7 +32,7 @@ class TokenResponse(ORMModel):
     refresh_token: str
     token_type: str = "bearer"
 
-class UserProfileResponse(ORMModel):   # базовая информация о пользователе в ответе авторизации
+class UserProfileResponse(ORMModel):  
     id: int
     name: str
     phone: str

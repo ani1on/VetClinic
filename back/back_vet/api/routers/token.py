@@ -11,9 +11,9 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/token")
 async def login_for_access_token(request: Request, db: Session = Depends(get_db)):
-    # Получаем данные из формы (x-www-form-urlencoded)
+    # Получаем данные из формы 
     form = await request.form()
-    username = form.get("username")   # email или телефон
+    username = form.get("username")  
     password = form.get("password")
 
     if not username or not password:

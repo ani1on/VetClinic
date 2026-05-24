@@ -16,13 +16,11 @@ from ...database.crud.pet import (
 
 router = APIRouter(prefix="/api/pets", tags=["pets"])
 
-# ---------- Административный эндпоинт (должен быть ПЕРЕД /{pet_id}) ----------
 @router.get("/all", response_model=List[schemas.pet.PetResponse])
 def get_all_pets(admin = Depends(get_current_admin), db: Session = Depends(get_db)):
     """Возвращает всех питомцев (только для администратора)"""
     return db.query(models.Pet).all()
 
-# ---------- Пользовательские эндпоинты ----------
 @router.post("/", response_model=schemas.pet.PetResponse, status_code=status.HTTP_201_CREATED)
 def create(payload: schemas.pet.PetCreateRequest, current_user = Depends(get_current_user), db: Session = Depends(get_db)):
     return create_pet(db, current_user.id, payload.dict())

@@ -31,7 +31,7 @@ class MedicalRecordResponse(ORMModel):
     diagnosis: Optional[str]
     treatment: Optional[str]
     notes: Optional[str]
-    files: Optional[str]   # строка с JSON или CSV
+    files: Optional[str] 
 
 class PetResponse(ORMModel):
     id: int
@@ -46,5 +46,4 @@ class PetResponse(ORMModel):
     notes: Optional[str]
     created_at: datetime
     is_archived: bool
-    # Медицинская история опционально
     medical_records: Optional[List[MedicalRecordResponse]] = []

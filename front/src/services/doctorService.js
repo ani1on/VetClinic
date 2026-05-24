@@ -10,7 +10,6 @@ export default {
   getSlots(doctorId, date) {
     return apiClient.get(`/doctors/${doctorId}/slots`, { params: { date } });
   },
-  // Новые методы
   createDoctor(data) {
     return apiClient.post('/doctors/', data);
   },

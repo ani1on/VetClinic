@@ -13,12 +13,12 @@ from ...database.crud.doctor import (
     update_doctor,
     archive_doctor
 )
-from ...database import models              # импорт всех моделей
-from ...database.models.user import User    # конкретно User для проверки
+from ...database import models              
+from ...database.models.user import User
 
 router = APIRouter(prefix="/api/doctors", tags=["doctors"])
 
-# ---------- Публичные эндпоинты ----------
+
 @router.get("/", response_model=List[schemas.doctor.DoctorResponse])
 def get_doctors(db: Session = Depends(get_db)):
     return list_doctors(db)
@@ -46,14 +46,14 @@ def doctor_slots(
             cur = (datetime.datetime.combine(date, cur) + datetime.timedelta(minutes=s.slot_duration)).time()
     return slots
 
-# ---------- Административные эндпоинты ----------
+
 @router.post("/", response_model=schemas.doctor.DoctorResponse, status_code=status.HTTP_201_CREATED)
 def create(payload: schemas.doctor.DoctorCreateRequest, admin = Depends(get_current_admin), db: Session = Depends(get_db)):
-    # Проверка существования пользователя
+
     user = db.query(User).get(payload.user_id)
     if not user:
         raise HTTPException(status_code=400, detail="Пользователь не найден")
-    # Проверка, что такой врач ещё не привязан к этому пользователю
+
     existing = db.query(models.Doctor).filter(models.Doctor.user_id == payload.user_id).first()
     if existing:
         raise HTTPException(status_code=400, detail="Врач для этого пользователя уже существует")

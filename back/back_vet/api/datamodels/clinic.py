@@ -7,7 +7,7 @@ class ClinicInfoUpdateRequest(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
-    working_hours: Optional[str] = None   # JSON строка
+    working_hours: Optional[str] = None  
     social_links: Optional[str] = None
     licenses: Optional[str] = None
     about_text: Optional[str] = None

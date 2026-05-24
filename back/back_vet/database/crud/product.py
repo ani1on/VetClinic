@@ -12,7 +12,7 @@ def get_product(db: Session, product_id: int):
 
 
 def get_product_by_id(db: Session, product_id: int):
-    """Возвращает товар по ID (аналог get_product)."""
+
     return db.query(models.Product).filter(models.Product.id == product_id).first()
 
 
@@ -25,11 +25,7 @@ def create_product(db: Session, payload: dict):
 
 
 def update_product(db: Session, product_id: int, payload: dict):
-    """
-    Частичное обновление товара.
-    payload – словарь с изменяемыми полями (например, {"name": "...", "price": ...}).
-    Возвращает обновлённый объект или None.
-    """
+
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
         return None
@@ -44,10 +40,7 @@ def update_product(db: Session, product_id: int, payload: dict):
 
 
 def update_product_stock(db: Session, product_id: int, quantity: int):
-    """
-    Устанавливает новое количество товара на складе.
-    Возвращает обновлённый объект или None.
-    """
+
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
         return None
@@ -59,10 +52,7 @@ def update_product_stock(db: Session, product_id: int, quantity: int):
 
 
 def delete_product(db: Session, product_id: int):
-    """
-    Мягкое удаление: делает товар недоступным (is_available = False).
-    Возвращает обновлённый объект или None.
-    """
+
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
         return None

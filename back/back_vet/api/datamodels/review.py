@@ -17,8 +17,8 @@ class ReviewResponse(ORMModel):
     comment: Optional[str]
     status: str
     created_at: datetime
-    # если нужно – можно добавить user_name
-    # user_name: Optional[str] = None
+
+    user_name: Optional[str] = None
 
 class ReviewListResponse(ORMModel):
     total: int

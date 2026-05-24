@@ -58,8 +58,6 @@ def list_users(db: Session, filters: dict = None):
     return q.all()
 
 
-# -------- TOKENS --------
-
 def save_refresh_token(db: Session, user_id: int, token: str, expires_at: datetime):
     rt = models.RefreshToken(user_id=user_id, token=token, expires_at=expires_at)
     db.add(rt)
@@ -73,3 +71,33 @@ def validate_refresh_token(db: Session, token: str):
         models.RefreshToken.revoked.is_(False),
         models.RefreshToken.expires_at > datetime.now(timezone.utc)
     ).first()
+
+
+def update_user_role(db: Session, user_id: int, new_role: str) -> models.User | None:
+
+    allowed_roles = {'client', 'admin'}
+    if new_role not in allowed_roles:
+        raise ValueError(f"Недопустимая роль. Разрешены: {', '.join(allowed_roles)}")
+
+    user = get_user_by_id(db, user_id)
+    if not user:
+        return None
+
+    user.role = new_role
+    safe_commit(db)
+    db.refresh(user)
+    return user
+
+
+def delete_user(db: Session, user_id: int) -> bool:
+
+    user = get_user_by_id(db, user_id)
+    if not user:
+        return False
+
+
+    db.query(models.RefreshToken).filter(models.RefreshToken.user_id == user_id).delete()
+
+    db.delete(user)
+    safe_commit(db)
+    return True
