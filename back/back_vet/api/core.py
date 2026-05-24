@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
-
+import os
+print(f"PORT env: {os.environ.get('PORT')}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
