@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Для Vue CLI используем process.env.VUE_APP_API_BASE_URL
+const API_BASE_URL = process.env.VUE_APP_API_BASE_URL || '/api';
+
 const apiClient = axios.create({
-  baseURL: process.env.VITE_API_BASE_URL || '/api',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -34,7 +37,6 @@ apiClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return apiClient(originalRequest);
         } catch (refreshError) {
-          // Рефреш провалился — разлогиниваем
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           window.location.href = '/auth';
