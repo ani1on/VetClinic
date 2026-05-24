@@ -6,8 +6,8 @@
 
 ## 🌐 Ссылки на production (рабочие версии)
 
-- **Frontend:** [\[https://fastpig-vetclinic.vercel.app\]](https://clinicfastpig.netlify.app/) 
-- **Backend API:** [https://api.fastpig-vetclinic.com](https://api.fastpig-vetclinic.com) *(пример, замените на реальный адрес после деплоя)*  
+- **Frontend:** [\[https://fastpig-vetclinic.vercel.app]](https://clinicfastpig.netlify.app) 
+- **Backend API:** [\[https://api.fastpig-vetclinic.com]](https://vetclinic-yyu3.onrender.com)
 - **Swagger документация API:** `https://api.fastpig-vetclinic.com/docs` *(доступна после запуска бэкенда)*
 
 > Если вы разворачиваете проект локально, используйте адреса `http://localhost:8080` (frontend) и `http://localhost:8000` (backend).
@@ -296,8 +296,8 @@ VetClinic/
 ## 👥 Контакты
 
 - Разработчик: Ani1on
-- GitHub: [\[ссылка на профиль\]](https://github.com/ani1on)
-- Демо: [\[ссылка на рабочий сайт\]](https://clinicfastpig.netlify.app/)
+- GitHub: [\[\\[ссылка на профиль\\]\]](https://github.com/ani1on)
+- Демо: [\[\\[ссылка на рабочий сайт\\]\]](https://clinicfastpig.netlify.app)
 
 ---
 
