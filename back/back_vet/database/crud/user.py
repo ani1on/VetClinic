@@ -17,16 +17,7 @@ def create_user(db: Session, name: str, phone: str, email: str, password_hash: s
     db.add(user)
     safe_commit(db)
     db.refresh(user)
-    def set_first_admin():
-        db = SessionLocal()
-        # Найдите пользователя по email или phone (укажите нужные данные)
-        admin_user = db.query(User).filter(User.email == "anilon5656@gmail.com").first()
-        if admin_user and admin_user.role != "admin":
-            admin_user.role = "admin"
-            db.commit()
-            print("Администратор назначен!")
-        db.close()
-    return user
+
 
 
 def get_user_by_id(db: Session, user_id: int):

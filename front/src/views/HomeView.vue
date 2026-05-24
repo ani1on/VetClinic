@@ -113,7 +113,7 @@
         <p class="mini-title">Быстрые ссылки</p>
         <div class="hero-actions">
           <router-link class="button-secondary" to="/profile">Карточки питомцев</router-link>
-          <router-link class="button-secondary" to="/favorites">Избранное</router-link>
+          <router-link class="button-secondary" to="/favorits">Избранное</router-link>
           <router-link class="button-secondary" to="/about">О клинике</router-link>
         </div>
       </article>
