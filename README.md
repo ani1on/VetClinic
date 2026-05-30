@@ -6,8 +6,8 @@
 
 ## 🌐 Ссылки на production (рабочие версии)
 
-- **Frontend:** [\[https://fastpig-vetclinic.vercel.app]](https://clinicfastpig.netlify.app) 
-- **Backend API:** [\[https://api.fastpig-vetclinic.com]](https://vetclinic-yyu3.onrender.com)
+- **Frontend:** https://fastpig-vetclinic.vercel.app
+- **Backend API:** https://api.fastpig-vetclinic.com
 - **Swagger документация API:** `https://api.fastpig-vetclinic.com/docs` *(доступна после запуска бэкенда)*
 
 > Если вы разворачиваете проект локально, используйте адреса `http://localhost:8080` (frontend) и `http://localhost:8000` (backend).
