@@ -6,7 +6,7 @@
 
 ## 🌐 Ссылки на production (рабочие версии)
 
-- **Frontend:** https://fastpig-vetclinic.vercel.app
+- **Frontend:** [https://fastpig-vetclinic.vercel.app](https://clinicfastpig.netlify.app/)
 - **Backend API:** https://api.fastpig-vetclinic.com
 - **Swagger документация API:** `https://api.fastpig-vetclinic.com/docs` *(доступна после запуска бэкенда)*
 
