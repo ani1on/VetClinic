@@ -53,4 +53,10 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
+router.afterEach((to) => {
+  if (typeof window.ym === 'function') {
+    window.ym(109920587, 'hit', to.fullPath);
+  }
+});
+
 export default router;
