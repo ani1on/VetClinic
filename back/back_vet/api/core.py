@@ -1,20 +1,13 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from contextlib import contextmanager
 
-# Правильный импорт моделей и сессии – с учётом структуры папок
-from ..database.models import Base
-from ..database.core import SessionLocal
+from ..database.core import SessionLocal, init_db
 from ..database.models.user import User
-from .utils.security import get_password_hash  # проверьте путь
+from .utils.security import get_password_hash
 
-# Создаём приложение
 app = FastAPI()
 
-# Настройка CORS (как у вас было)
 origins = [
     "http://localhost:8080",
     "https://clinicfastpig.netlify.app",
@@ -28,25 +21,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# Инициализация БД (создание таблиц)
-def init_db():
-    engine = create_engine("sqlite:///./vetclinic.db", connect_args={"check_same_thread": False})
-    Base.metadata.create_all(bind=engine)
-
-
-# Событие запуска – создание администратора
 @app.on_event("startup")
 def create_admin_if_not_exists():
-    # Инициализируем БД (таблицы)
     init_db()
 
     db = SessionLocal()
     try:
-        # Проверяем, есть ли хоть один администратор
         admin = db.query(User).filter(User.role == "admin").first()
         if not admin:
-            # Безопасные значения из переменных окружения или по умолчанию
             admin_email = os.environ.get("ADMIN_EMAIL", "admin@fastpig.com")
             admin_phone = os.environ.get("ADMIN_PHONE", "+375291234567")
             admin_name = os.environ.get("ADMIN_NAME", "Главный администратор")
@@ -71,4 +53,3 @@ def create_admin_if_not_exists():
         db.rollback()
     finally:
         db.close()
-

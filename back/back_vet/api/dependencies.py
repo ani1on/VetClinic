@@ -2,9 +2,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from typing import Generator
 
-from ..database.core import SessionLocal
+from ..database.core import SessionLocal, get_db
 from ..database.crud.user import get_user_by_id
 from ..database.models.user import User
 
@@ -12,13 +11,6 @@ SECRET_KEY = "your-secret-key-change-in-production"
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
-
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),

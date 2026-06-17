@@ -19,10 +19,6 @@ app.include_router(reviews.router)
 app.include_router(clinic.router)
 app.include_router(admin.router)
 app.include_router(token.router)
-@app.on_event("startup")
-def startup():
-    from .back_vet.database.core import init_db
-    init_db()
 
 import os
 import uvicorn
