@@ -25,11 +25,10 @@ if DATABASE_URL.startswith("postgresql://"):
 
 connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 
-engine_kwargs = {"echo": False, "connect_args": connect_args}
 if "postgresql" in DATABASE_URL:
-    engine_kwargs["connect_args"] = {**connect_args, "prepare_threshold": 0}
+    connect_args["prepare_threshold"] = 0
 
-engine = create_engine(**engine_kwargs)
+engine = create_engine(DATABASE_URL, echo=False, connect_args=connect_args)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
