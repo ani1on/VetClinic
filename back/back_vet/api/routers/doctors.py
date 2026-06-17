@@ -50,7 +50,7 @@ def doctor_slots(
 @router.post("/", response_model=schemas.doctor.DoctorResponse, status_code=status.HTTP_201_CREATED)
 def create(payload: schemas.doctor.DoctorCreateRequest, admin = Depends(get_current_admin), db: Session = Depends(get_db)):
 
-    user = db.query(User).get(payload.user_id)
+    user = db.get(User, payload.user_id)
     if not user:
         raise HTTPException(status_code=400, detail="Пользователь не найден")
 

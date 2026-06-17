@@ -17,8 +17,7 @@ def create_user(db: Session, name: str, phone: str, email: str, password_hash: s
     db.add(user)
     safe_commit(db)
     db.refresh(user)
-
-
+    return user
 
 def get_user_by_id(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()

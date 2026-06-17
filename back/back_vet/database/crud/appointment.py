@@ -14,9 +14,9 @@ def list_user_appointments(db: Session, user_id: int):
         models.Appointment.user_id == user_id
     ).all()
     for a in appts:
-        a.pet = db.query(models.Pet).get(a.pet_id)
-        a.service = db.query(models.Service).get(a.service_id)
-        a.doctor = db.query(models.Doctor).get(a.doctor_id) if a.doctor_id else None
+        a.pet = db.get(models.Pet, a.pet_id)
+        a.service = db.get(models.Service, a.service_id)
+        a.doctor = db.get(models.Doctor, a.doctor_id) if a.doctor_id else None
     return appts
 
 def get_appointment_by_id(db: Session, appointment_id: int):
@@ -24,9 +24,9 @@ def get_appointment_by_id(db: Session, appointment_id: int):
         models.Appointment.id == appointment_id
     ).first()
     if appt:
-        appt.pet = db.query(models.Pet).get(appt.pet_id)
-        appt.service = db.query(models.Service).get(appt.service_id)
-        appt.doctor = db.query(models.Doctor).get(appt.doctor_id) if appt.doctor_id else None
+        appt.pet = db.get(models.Pet, appt.pet_id)
+        appt.service = db.get(models.Service, appt.service_id)
+        appt.doctor = db.get(models.Doctor, appt.doctor_id) if appt.doctor_id else None
     return appt
 
 def update_appointment(db: Session, appointment_id: int, payload: dict):
@@ -59,7 +59,7 @@ def cancel_appointment(db: Session, appointment_id: int):
 def list_all_appointments(db: Session):
     appts = db.query(models.Appointment).all()
     for a in appts:
-        a.pet = db.query(models.Pet).get(a.pet_id)
-        a.service = db.query(models.Service).get(a.service_id)
-        a.doctor = db.query(models.Doctor).get(a.doctor_id) if a.doctor_id else None
+        a.pet = db.get(models.Pet, a.pet_id)
+        a.service = db.get(models.Service, a.service_id)
+        a.doctor = db.get(models.Doctor, a.doctor_id) if a.doctor_id else None
     return appts

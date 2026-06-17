@@ -36,6 +36,8 @@ def delete_review(db: Session, review_id: int, user_id: int, is_admin: bool = Fa
     review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if not review:
         return False
+    if not is_admin and review.user_id != user_id:
+        return False
     db.delete(review)
     safe_commit(db)
     return True

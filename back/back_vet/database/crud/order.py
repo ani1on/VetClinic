@@ -59,7 +59,7 @@ def create_order(db: Session, user_id: int):
     items = []
 
     for c in cart:
-        product = db.query(models.Product).get(c.product_id)
+        product = db.get(models.Product, c.product_id)
 
         if not product or product.stock_quantity < c.quantity:
             raise ValueError("Stock error")
