@@ -107,6 +107,7 @@
       <p v-if="doctorsError" class="error-text">{{ doctorsError }}</p>
       <div v-if="doctors.length" class="list-column">
         <article v-for="doc in doctors" :key="doc.id" class="feed-card">
+          <img v-if="doc.photo_url" :src="doc.photo_url" :alt="doc.full_name" class="admin-card-image" />
           <div class="meta-row">
             <strong>{{ doc.full_name }}</strong>
             <span class="chip">{{ doc.specialization || 'Общий' }}</span>
@@ -168,6 +169,7 @@
           <label class="field"><span>Категория</span><input v-model="productForm.category" /></label>
           <label class="field"><span>Цена</span><input type="number" v-model="productForm.price" /></label>
           <label class="field"><span>Количество</span><input type="number" v-model="productForm.stock_quantity" min="0" /></label>
+          <label class="field"><span>URL изображения</span><input v-model="productForm.image_url" placeholder="https://..." /></label>
         </div>
         <label class="field"><span>Описание</span><textarea v-model="productForm.description"></textarea></label>
         <div class="hero-actions">
@@ -180,6 +182,7 @@
       <p v-if="productsLoadError" class="error-text">{{ productsLoadError }}</p>
       <div v-if="products.length" class="list-column">
         <article v-for="prod in products" :key="prod.id" class="feed-card">
+          <img v-if="prod.image_url" :src="prod.image_url" :alt="prod.name" class="admin-card-image" />
           <div class="meta-row"><strong>{{ prod.name }}</strong><span class="chip">{{ prod.price }} BYN</span></div>
           <p class="muted">Остаток: {{ prod.stock_quantity }} | {{ prod.is_available ? 'Активен' : 'В архиве' }}</p>
           <div class="inline-actions">
@@ -216,6 +219,7 @@
       <p v-if="newsLoadError" class="error-text">{{ newsLoadError }}</p>
       <div v-if="newsList.length" class="list-column">
         <article v-for="item in newsList" :key="item.id" class="feed-card">
+          <img v-if="item.image_url" :src="item.image_url" :alt="item.title" class="admin-card-image" />
           <div class="meta-row"><strong>{{ item.title }}</strong><span class="chip">{{ item.is_published ? 'Опубликовано' : 'Черновик' }}</span></div>
           <p class="muted">{{ item.content?.slice(0, 100) }}…</p>
           <div class="inline-actions">
@@ -707,7 +711,7 @@ export default {
     },
     // --- Products ---
     emptyProductForm() {
-      return { id: null, name: '', description: '', price: '', stock_quantity: 0, category: '' };
+      return { id: null, name: '', description: '', price: '', stock_quantity: 0, category: '', image_url: '' };
     },
     async fetchProducts() {
       this.productsLoading = true;
@@ -920,6 +924,12 @@ export default {
 </script>
 
 <style scoped>
+.admin-card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 16px;
+}
 .chip.active { background: var(--primary); color: #fff; }
 .error-text { color: #e53e3e; margin: 0.5rem 0; }
 .list-section { margin-top: 12px; }

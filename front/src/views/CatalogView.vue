@@ -28,6 +28,7 @@
 
     <section v-if="displayedProducts.length" class="catalog-grid">
       <article v-for="product in displayedProducts" :key="product.id" class="tile">
+        <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="card-image" />
         <div class="meta-row">
           <span class="chip">{{ product.category }}</span>
           <strong>{{ product.price }} BYN</strong>
@@ -189,6 +190,12 @@ export default {
 </script>
 
 <style scoped>
+.card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+}
 .toast { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 20px; border-radius: 12px; background: #323232; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: fadeIn 0.3s ease; }
 .toast.success { background: #2b7e3a; }
 .toast.error { background: #c62828; }

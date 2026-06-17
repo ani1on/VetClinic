@@ -12,6 +12,7 @@
 
     <section v-if="favorites.length" class="favorites-grid">
       <article v-for="item in favorites" :key="item.id" class="tile">
+        <img v-if="getEntityImage(item)" :src="getEntityImage(item)" :alt="getEntityName(item)" class="card-image" />
         <div class="meta-row">
           <h2 class="card-title">{{ getEntityName(item) }}</h2>
           <span class="chip">{{ translateEntityType(item.entity_type) }}</span>
@@ -152,6 +153,11 @@ export default {
       return info ? info.name : `${this.translateEntityType(item.entity_type)} #${item.entity_id}`;
     },
 
+    getEntityImage(item) {
+      const info = this.getEntityInfo(item);
+      return info ? (info.image_url || info.photo_url) : null;
+    },
+
     getEntityDetail(item) {
       return this.getEntityInfo(item) || {};
     },
@@ -167,7 +173,8 @@ export default {
           description: p.description,
           price: p.price,
           category: p.category,
-          is_available: p.is_available
+          is_available: p.is_available,
+          image_url: p.image_url
         } : null;
       }
       else if (type === 'service') {
@@ -187,7 +194,8 @@ export default {
           name: d.full_name,
           description: d.description,
           specialization: d.specialization,
-          is_active: d.is_active
+          is_active: d.is_active,
+          photo_url: d.photo_url
         } : null;
       }
       return null;
@@ -212,6 +220,12 @@ export default {
 </script>
 
 <style scoped>
+.card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+}
 .error-text { color: #e53e3e; }
 
 .entity-details {

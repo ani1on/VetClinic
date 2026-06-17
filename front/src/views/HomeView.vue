@@ -100,6 +100,7 @@
         <p v-if="newsError" class="error-text">{{ newsError }}</p>
         <div v-if="news.length" class="list-column">
           <article v-for="item in news" :key="item.id" class="feed-card">
+            <img v-if="item.image_url" :src="item.image_url" :alt="item.title" class="card-image" />
             <div class="meta-row">
               <strong>{{ item.title }}</strong>
               <span class="chip">{{ item.created_at?.slice(0,10) }}</span>
@@ -303,6 +304,12 @@ export default {
 </script>
 
 <style scoped>
+.card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+}
 .error-text {
   color: #e53e3e;
   margin-top: 0.5rem;
