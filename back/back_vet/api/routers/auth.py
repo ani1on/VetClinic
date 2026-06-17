@@ -33,7 +33,12 @@ def register(request: schemas.auth.RegisterRequest, db: Session = Depends(get_db
     user = create_user(
         db, name=request.name, phone=request.phone,
         email=request.email, password_hash=hashed,
-        role=request.role or "client"
+        role=request.role or "client",
+        utm_source=request.utm_source,
+        utm_medium=request.utm_medium,
+        utm_campaign=request.utm_campaign,
+        utm_term=request.utm_term,
+        utm_content=request.utm_content,
     )
 
     access_token = create_access_token(user.id)

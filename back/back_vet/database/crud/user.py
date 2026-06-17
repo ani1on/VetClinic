@@ -6,13 +6,20 @@ from .. import models
 from .base import safe_commit
 
 
-def create_user(db: Session, name: str, phone: str, email: str, password_hash: str, role: str = "client"):
+def create_user(db: Session, name: str, phone: str, email: str, password_hash: str, role: str = "client",
+                utm_source: str = None, utm_medium: str = None, utm_campaign: str = None,
+                utm_term: str = None, utm_content: str = None):
     user = models.User(
         name=name,
         phone=phone,
         email=email,
         password_hash=password_hash,
-        role=role
+        role=role,
+        utm_source=utm_source,
+        utm_medium=utm_medium,
+        utm_campaign=utm_campaign,
+        utm_term=utm_term,
+        utm_content=utm_content,
     )
     db.add(user)
     safe_commit(db)

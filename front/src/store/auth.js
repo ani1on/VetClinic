@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 import authService from '@/services/authService';
+import { getUTM, clearUTM } from '@/utils/utm';
 
 // Ключи для localStorage
 const TOKEN_KEY = 'access_token';
@@ -46,11 +47,14 @@ export async function register(data) {
   authState.isLoading = true;
   authState.error = null;
   try {
-    const response = await authService.register(data);
+    const utm = getUTM();
+    const payload = { ...data, ...utm };
+    const response = await authService.register(payload);
     const { access_token, refresh_token, user } = response.data;
     saveTokens(access_token, refresh_token);
     authState.user = user;
     authState.isAuthenticated = true;
+    clearUTM();
   } catch (err) {
     authState.error = err.response?.data?.detail || 'Ошибка регистрации';
     throw err;

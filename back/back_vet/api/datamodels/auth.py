@@ -10,6 +10,11 @@ class RegisterRequest(BaseModel):
     email: Optional[EmailStr] = None
     password: str = Field(..., min_length=6)
     role: Optional[str] = "client"
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
+    utm_term: Optional[str] = None
+    utm_content: Optional[str] = None
 
 class LoginRequest(BaseModel):
     login: str = Field(..., description="Email или телефон")

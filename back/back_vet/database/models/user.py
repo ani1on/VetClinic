@@ -16,6 +16,12 @@ class User(Base):
     role = Column(String(20), default="client")
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    utm_source = Column(String(100), nullable=True)
+    utm_medium = Column(String(100), nullable=True)
+    utm_campaign = Column(String(200), nullable=True)
+    utm_term = Column(String(200), nullable=True)
+    utm_content = Column(String(200), nullable=True)
+
     pets = relationship("Pet", back_populates="owner", cascade="all, delete")
     appointments = relationship("Appointment", back_populates="user")
     orders = relationship("Order", back_populates="user")

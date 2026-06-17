@@ -9,6 +9,7 @@ import AboutView from "../views/AboutView.vue";
 import AdminView from "../views/AdminView.vue";
 import NotFoundView from '@/views/NotFoundView.vue';
 import { authState } from '@/store/auth';
+import { captureUTMFromCurrentURL } from '@/utils/utm';
 
 const routes = [
   { path: "/", name: "home", component: HomeView },
@@ -31,6 +32,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  captureUTMFromCurrentURL();
+
   // 1. Проверка обычной авторизации
   if (to.meta.requiresAuth && !authState.isAuthenticated) {
     next('/auth');
