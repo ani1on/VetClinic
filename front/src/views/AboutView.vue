@@ -35,13 +35,13 @@
     <section class="social-section">
       <h2 class="section-title">Мы в соцсетях</h2>
       <div class="social-links">
-        <a href="https://www.instagram.com/ani1onn" class="social-link instagram">
+        <a href="https://www.instagram.com/ani1onn" class="social-link instagram" target="_blank" @click="trackSocial('instagram')">
           <span class="social-icon">📷</span> Instagram
         </a>
-        <a href="https://web.telegram.org/ani1on" class="social-link telegram">
+        <a href="https://web.telegram.org/ani1on" class="social-link telegram" target="_blank" @click="trackSocial('telegram')">
           <span class="social-icon">📨</span> Telegram
         </a>
-        <a href="https://vk.com/v_vrrrrrrrrrrrrrrrrtoi" class="social-link vk">
+        <a href="https://vk.com/v_vrrrrrrrrrrrrrrrrtoi" class="social-link vk" target="_blank" @click="trackSocial('vk')">
           <span class="social-icon">🔵</span> VK
         </a>
       </div>
@@ -118,15 +118,18 @@ export default {
         this.clinic = resp.data;
       } catch (e) {
         const errorMessage = this.parseApiError(e);
-        // Показываем ошибку только если它不是 null (для 404 не показываем)
         if (errorMessage) {
           this.error = errorMessage;
         } else {
-          // При 404 просто оставляем clinic = null, без ошибки
           this.clinic = null;
         }
       } finally {
         this.isLoading = false;
+      }
+    },
+    trackSocial(platform) {
+      if (typeof window.ym === 'function') {
+        window.ym(109920587, 'reachGoal', 'social_click', { platform });
       }
     }
   }
