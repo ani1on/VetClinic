@@ -286,14 +286,14 @@
             <div class="appt-detail"><span class="label">🩺 Врач</span><span>{{ getApptDoctorName(appt.doctor_id) }}</span></div>
           </div>
           <div class="appt-actions">
-            <select v-model="appt._newStatus" class="status-select" @change="changeApptStatus(appt.id, appt._newStatus)">
-              <option v-if="!appt._newStatus" disabled value="">Изменить статус...</option>
-              <option value="pending">🕒 Ожидает</option>
-              <option value="confirmed">✅ Подтверждено</option>
-              <option value="completed">✔️ Завершено</option>
-              <option value="paid">💰 Оплачено</option>
-              <option value="canceled">❌ Отменено</option>
-            </select>
+            <div class="status-buttons">
+              <button v-for="s in appointmentStatuses" :key="s.value"
+                class="status-btn" :class="'status-btn-' + s.value"
+                :disabled="appt.status === s.value"
+                @click="changeApptStatus(appt.id, s.value)">
+                {{ s.icon }} {{ s.label }}
+              </button>
+            </div>
           </div>
         </article>
       </div>
@@ -358,6 +358,13 @@ export default {
         { key: 'reviews', label: 'Reviews' },
         { key: 'appointments', label: 'Appointments' },
         { key: 'clinic', label: 'Clinic' },
+      ],
+      appointmentStatuses: [
+        { value: 'pending', label: 'Ожидает', icon: '🕒' },
+        { value: 'confirmed', label: 'Подтверждено', icon: '✅' },
+        { value: 'completed', label: 'Завершено', icon: '✔️' },
+        { value: 'paid', label: 'Оплачено', icon: '💰' },
+        { value: 'canceled', label: 'Отменено', icon: '❌' },
       ],
       // Dashboard
       metrics: [],
@@ -946,20 +953,92 @@ export default {
 .appt-details { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; }
 .appt-detail { display: flex; align-items: center; gap: 6px; font-size: 0.95rem; }
 .appt-detail .label { color: var(--muted); font-weight: 600; font-size: 0.85rem; }
-.appt-actions { display: flex; justify-content: flex-end; }
-.toast {
-  position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 20px; border-radius: 12px;
-  background: #323232; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  animation: fadeIn 0.3s ease;
+.appt-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+.status-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-.toast.success { background: #2b7e3a; }
-.toast.error { background: #c62828; }
+.status-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.status-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.status-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.status-btn-pending { border-color: #ffc107; color: #856404; }
+.status-btn-pending:hover:not(:disabled) { background: #fff3cd; }
+.status-btn-confirmed { border-color: #17a2b8; color: #0c5460; }
+.status-btn-confirmed:hover:not(:disabled) { background: #d1ecf1; }
+.status-btn-completed { border-color: #28a745; color: #155724; }
+.status-btn-completed:hover:not(:disabled) { background: #d4edda; }
+.status-btn-paid { border-color: #20c997; color: #0b2e13; }
+.status-btn-paid:hover:not(:disabled) { background: #c3e6cb; }
+.status-btn-canceled { border-color: #dc3545; color: #721c24; }
+.status-btn-canceled:hover:not(:disabled) { background: #f8d7da; }
+.toast {
+  position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 14px 22px; border-radius: 14px;
+  background: #323232; color: white; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toast.success { background: linear-gradient(135deg, #2b7e3a, #3aa17e); }
+.toast.error { background: linear-gradient(135deg, #c62828, #e53e3e); }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }
 .role-select {
-  padding: 6px 10px; border-radius: 20px; border: 1px solid var(--line); background: white;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236d5f57' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.role-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.12);
+  outline: none;
+}
+select {
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236d5f57' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 122, 89, 0.12);
+  outline: none;
 }
 /* Адаптивные вкладки для мобильных устройств */
 @media (max-width: 768px) {

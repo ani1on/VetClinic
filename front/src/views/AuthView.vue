@@ -82,7 +82,8 @@
             <input type="email" v-model="registerForm.email" placeholder="anna@mail.com" />
             <span v-if="registerErrors.email" class="field-error">{{ registerErrors.email }}</span>
           </label>
-          <label class="field">
+          <div></div>
+          <label class="field field-full">
             <span>Пароль</span>
             <input type="password" v-model="registerForm.password" placeholder="Придумайте пароль" @input="checkPasswordStrength" />
             <span v-if="registerErrors.password" class="field-error">{{ registerErrors.password }}</span>
@@ -408,6 +409,10 @@ export default {
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.field-full {
+  grid-column: 1 / -1;
 }
 
 .password-strength { margin-top: 8px; }

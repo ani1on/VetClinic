@@ -773,6 +773,14 @@ button, input, select, textarea {
   transition: all var(--transition-fast);
   font-size: 0.95rem;
 }
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236d5f57' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
