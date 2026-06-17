@@ -6,6 +6,9 @@ from .models import Base
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./vetclinic.db")
 
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+
 connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 
 engine = create_engine(DATABASE_URL, echo=False, connect_args=connect_args)
