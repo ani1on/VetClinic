@@ -278,21 +278,11 @@ export default {
       }
     },
     async fetchTodayStats() {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        this.todayStats = {
-          operations: 8,
-          onlineConfirmations: 19,
-          repeatOrders: 34
-        };
-      } catch (e) {
-        console.warn('Не удалось загрузить статистику за сегодня', e);
-        this.todayStats = {
-          operations: 8,
-          onlineConfirmations: 19,
-          repeatOrders: 34
-        };
-      }
+      this.todayStats = {
+        operations: 8,
+        onlineConfirmations: 19,
+        repeatOrders: 34
+      };
     },
     formatDate(dateStr) {
       if (!dateStr) return '';
