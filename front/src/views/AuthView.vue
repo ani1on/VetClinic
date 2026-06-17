@@ -363,51 +363,70 @@ export default {
   color: #e53e3e;
   margin-top: 0.5rem;
   font-size: 0.9rem;
+  padding: 10px 14px;
+  background: rgba(229, 62, 62, 0.08);
+  border-radius: 12px;
+  border-left: 3px solid #e53e3e;
 }
 .field-error {
   color: #e53e3e;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   margin-top: 4px;
   display: block;
+  animation: shake 0.3s ease;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 1000;
-  padding: 12px 20px;
-  border-radius: 12px;
+  padding: 14px 22px;
+  border-radius: 14px;
   background: #323232;
   color: white;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  animation: fadeIn 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.toast.success { background: #2b7e3a; }
-.toast.error { background: #c62828; }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
+.toast.success { background: linear-gradient(135deg, #2b7e3a, #3aa17e); }
+.toast.error { background: linear-gradient(135deg, #c62828, #e53e3e); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.split-grid .panel {
+  animation: fadeInUp 0.5s ease backwards;
+}
+.split-grid .panel:nth-child(1) { animation-delay: 0.1s; }
+.split-grid .panel:nth-child(2) { animation-delay: 0.2s; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Индикатор сложности пароля */
-.password-strength {
-  margin-top: 8px;
-}
+.password-strength { margin-top: 8px; }
 .strength-bar {
-  height: 4px;
+  height: 5px;
   width: 100%;
   background: #e0e0e0;
-  border-radius: 4px;
-  transition: background 0.2s;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
-.strength-bar.weak { background: #e53e3e; width: 33%; }
-.strength-bar.medium { background: #f39c12; width: 66%; }
-.strength-bar.strong { background: #2b7e3a; width: 100%; }
+.strength-bar.weak { background: linear-gradient(90deg, #e53e3e, #ff6b6b); width: 33%; }
+.strength-bar.medium { background: linear-gradient(90deg, #f39c12, #f1c40f); width: 66%; }
+.strength-bar.strong { background: linear-gradient(90deg, #2b7e3a, #3aa17e); width: 100%; }
 .strength-text {
-  font-size: 0.75rem;
-  margin-top: 4px;
+  font-size: 0.78rem;
+  margin-top: 6px;
   display: block;
+  font-weight: 600;
 }
 .strength-text.weak { color: #e53e3e; }
 .strength-text.medium { color: #f39c12; }
@@ -416,30 +435,36 @@ export default {
   list-style: none;
   padding: 0;
   margin: 8px 0 0;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   color: #6d5f57;
 }
 .password-requirements li {
-  margin: 4px 0;
+  margin: 5px 0;
+  transition: all 0.2s ease;
+  padding: 2px 0;
 }
 .password-requirements li.met {
   color: #2b7e3a;
-  text-decoration: line-through;
+  font-weight: 600;
+}
+.password-requirements li.met::before {
+  content: "✓ ";
 }
 
-/* Стили для модального окна */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .modal-container {
   background: var(--surface-strong);
@@ -448,6 +473,11 @@ export default {
   max-width: 480px;
   box-shadow: var(--shadow);
   overflow: hidden;
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .modal-header {
   display: flex;
@@ -468,10 +498,20 @@ export default {
   cursor: pointer;
   color: var(--muted);
   line-height: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
-.modal-body {
-  padding: 24px;
+.modal-close:hover {
+  background: rgba(229, 62, 62, 0.08);
+  color: #e53e3e;
+  transform: rotate(90deg);
 }
+.modal-body { padding: 24px; }
 .modal-description {
   margin: 0 0 16px;
   color: var(--muted);

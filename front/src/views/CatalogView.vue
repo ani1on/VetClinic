@@ -195,13 +195,65 @@ export default {
   height: 200px;
   object-fit: cover;
   border-radius: 16px;
+  transition: transform 0.3s ease;
 }
-.toast { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 20px; border-radius: 12px; background: #323232; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: fadeIn 0.3s ease; }
-.toast.success { background: #2b7e3a; }
-.toast.error { background: #c62828; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-.error-text { color: #e53e3e; margin: 0.5rem 0; }
+.tile:hover .card-image {
+  transform: scale(1.03);
+}
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 14px 22px;
+  border-radius: 14px;
+  background: #323232;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toast.success { background: linear-gradient(135deg, #2b7e3a, #3aa17e); }
+.toast.error { background: linear-gradient(135deg, #c62828, #e53e3e); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+.error-text {
+  color: #e53e3e;
+  margin: 0.5rem 0;
+  padding: 10px 14px;
+  background: rgba(229, 62, 62, 0.08);
+  border-radius: 12px;
+  border-left: 3px solid #e53e3e;
+}
 .filters { display: flex; gap: 12px; align-items: center; }
-.search-input { padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); }
+.search-input {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  transition: all 0.2s ease;
+  flex: 1;
+  max-width: 300px;
+}
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(255, 122, 89, 0.12);
+}
 .load-more-wrapper { display: flex; justify-content: center; margin-top: 20px; }
+
+.catalog-grid .tile {
+  animation: fadeInUp 0.4s ease backwards;
+}
+.catalog-grid .tile:nth-child(1) { animation-delay: 0.05s; }
+.catalog-grid .tile:nth-child(2) { animation-delay: 0.1s; }
+.catalog-grid .tile:nth-child(3) { animation-delay: 0.15s; }
+.catalog-grid .tile:nth-child(4) { animation-delay: 0.2s; }
+.catalog-grid .tile:nth-child(5) { animation-delay: 0.25s; }
+.catalog-grid .tile:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 </style>

@@ -303,28 +303,45 @@ export default {
 .error-text {
   color: #e53e3e;
   margin-top: 0.5rem;
+  padding: 10px 14px;
+  background: rgba(229, 62, 62, 0.08);
+  border-radius: 12px;
+  border-left: 3px solid #e53e3e;
 }
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 1000;
-  padding: 12px 20px;
-  border-radius: 12px;
+  padding: 14px 22px;
+  border-radius: 14px;
   background: #323232;
   color: white;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  animation: fadeIn 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .toast.success {
-  background: #2b7e3a;
+  background: linear-gradient(135deg, #2b7e3a, #3aa17e);
 }
 .toast.error {
-  background: #c62828;
+  background: linear-gradient(135deg, #c62828, #e53e3e);
 }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.stat-card {
+  animation: fadeInUp 0.5s ease backwards;
+}
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -355,9 +372,13 @@ export default {
 .star {
   color: #ddd;
   font-size: 1.2rem;
+  transition: transform 0.2s ease;
 }
 .star.filled {
   color: #ffb800;
+}
+.review-card:hover .star.filled {
+  transform: scale(1.2);
 }
 .review-author {
   font-weight: 600;
@@ -370,5 +391,6 @@ export default {
 .review-date {
   font-size: 0.8rem;
   margin-top: 8px;
+  color: var(--muted);
 }
 </style>
