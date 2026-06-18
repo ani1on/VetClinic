@@ -9,6 +9,7 @@ __pycache__/
 *.db
 
 # Distribution / packaging
+.mimocode
 .Python
 build/
 develop-eggs/
